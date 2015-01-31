@@ -36,13 +36,6 @@ class ClassAliasLoader {
 	}
 
 	/**
-	 * @return ComposerClassLoader
-	 */
-	public function getComposerClassLoader() {
-		return $this->composerClassLoader;
-	}
-
-	/**
 	 * @param array $aliasMap
 	 */
 	public function setAliasMap(array $aliasMap) {
