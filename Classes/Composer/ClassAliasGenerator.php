@@ -19,9 +19,7 @@ class ClassAliasGenerator {
 
 
 	static public function generateAliasMap(\Composer\Script\Event $event) {
-
 		$event->getIO()->write('<info>Generating class alias map files</info>');
-
 
 		$composer = $event->getComposer();
 		$config = $composer->getConfig();
@@ -42,17 +40,15 @@ class ClassAliasGenerator {
 		$classNameToAliasMapping = array();
 		$mappingFound = false;
 
-
 		foreach ($packageMap as $item) {
 			list($package, $installPath) = $item;
 			$extra = $package->getExtra();
-
 			if (!empty($extra['class-alias-maps'])) {
 				if (!is_array($extra['class-alias-maps'])) {
 					throw new \Exception('"class-alias-maps" must be an array');
 				}
 				foreach ($extra['class-alias-maps'] as $mapFile) {
-					$mapFilePath = $basePath . '/' . ($installPath ? $installPath . '/' : '') . $filesystem->normalizePath($mapFile);
+					$mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
 					if (is_file($mapFilePath)) {
 						$packageAliasMap = require $mapFilePath;
 						if (!is_array($packageAliasMap)) {
@@ -109,10 +105,7 @@ return call_user_func(function() {
 
 EOF;
 
-
-
 		file_put_contents($vendorPath . '/autoload.php', $autoloadFileContent);
-
 
 		return true;
 	}
