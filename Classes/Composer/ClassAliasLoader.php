@@ -89,7 +89,7 @@ class ClassAliasLoader {
 	 * @return bool
 	 */
 	protected function loadOriginalClassAndSetAliases($originalClassName) {
-		if ($this->composerClassLoader->loadClass($originalClassName)) {
+		if (class_exists($originalClassName, false) || $this->composerClassLoader->loadClass($originalClassName)) {
 			foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
 				if (!class_exists($aliasClassName, false)) {
 					class_alias($originalClassName, $aliasClassName);
