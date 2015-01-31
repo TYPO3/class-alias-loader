@@ -36,6 +36,8 @@ class ClassAliasLoader {
 	}
 
 	/**
+	 * Set the alias map
+	 *
 	 * @param array $aliasMap
 	 */
 	public function setAliasMap(array $aliasMap) {
@@ -43,6 +45,8 @@ class ClassAliasLoader {
 	}
 
 	/**
+	 * Adds an alias map and merges it with already available map
+	 *
 	 * @param array $aliasMap
 	 */
 	public function addAliasMap(array $aliasMap) {
@@ -54,6 +58,8 @@ class ClassAliasLoader {
 	}
 
 	/**
+	 * Main class loading method registered with spl_autoload_register()
+	 *
 	 * @param string $className
 	 * @return bool
 	 */
@@ -75,6 +81,10 @@ class ClassAliasLoader {
 	}
 
 	/**
+	 * Load classes and set aliases.
+	 * The class_exists calls are safety guards to avoid fatals when
+	 * class files were included or aliases were set manually in userland code.
+	 *
 	 * @param string $originalClassName
 	 * @return bool
 	 */
