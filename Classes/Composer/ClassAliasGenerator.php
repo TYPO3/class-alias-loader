@@ -10,6 +10,7 @@ namespace Helhum\ClassAliasLoader\Composer;
  * file that was distributed with this source code.
  */
 
+use Composer\Package\RootPackageInterface;
 use Composer\Util\Filesystem;
 
 /**
@@ -35,6 +36,8 @@ class ClassAliasGenerator {
 		$autoLoadGenerator = $composer->getAutoloadGenerator();
 		$localRepo = $composer->getRepositoryManager()->getLocalRepository();
 		$packageMap = $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
+
+		$caseSensitiveClassLoading = self::caseSensitiveClassLoading($mainPackage, $targetDir) ? 'true' : 'false';
 
 		$aliasToClassNameMapping = array();
 		$classNameToAliasMapping = array();
@@ -95,9 +98,8 @@ return call_user_func(function() {
 	\$aliasClassLoader = new Helhum\ClassAliasLoader\Composer\ClassAliasLoader(\$composerClassLoader);
 
 	\$classAliasMap = require __DIR__ . '/composer/autoload_classaliasmap.php';
-
 	\$aliasClassLoader->setAliasMap(\$classAliasMap);
-
+	\$aliasClassLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
 	spl_autoload_register(array(\$aliasClassLoader, 'loadClassWithAlias'), true, true);
 
 	return \$aliasClassLoader;
@@ -108,5 +110,33 @@ EOF;
 		file_put_contents($vendorPath . '/autoload.php', $autoloadFileContent);
 
 		return true;
+	}
+
+	/**
+	 * Rewrites the class map to have lowercased keys to be able to load classes with wrong casing
+	 * Defaults to case sensitivity (composer loader default)
+	 *
+	 * @param RootPackageInterface $mainPackage
+	 * @param string $targetDir
+	 * @return bool
+	 */
+	static protected function caseSensitiveClassLoading(RootPackageInterface $mainPackage, $targetDir) {
+		$extra = $mainPackage->getExtra();
+		$caseSensitiveClassLoading = true;
+		if (isset($extra['autoload-case-sensitivity'])) {
+			$caseSensitiveClassLoading =  (bool)$extra['autoload-case-sensitivity'];
+		}
+		if (!$caseSensitiveClassLoading) {
+			$classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
+			$classMapContents = preg_replace_callback(
+				'/    \'[^\']*\' => /',
+				function($match) {
+					return strtolower($match[0]);
+				},
+				$classMapContents
+			);
+			file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
+		}
+		return $caseSensitiveClassLoading;
 	}
 }
