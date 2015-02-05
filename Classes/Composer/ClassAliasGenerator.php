@@ -124,7 +124,7 @@ EOF;
 		$extra = $mainPackage->getExtra();
 		$caseSensitiveClassLoading = true;
 		if (isset($extra['autoload-case-sensitivity'])) {
-			$caseSensitiveClassLoading =  (bool)$extra['autoload-case-sensitivity'];
+			$caseSensitiveClassLoading = (bool)$extra['autoload-case-sensitivity'];
 		}
 		if (!$caseSensitiveClassLoading) {
 			$classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
