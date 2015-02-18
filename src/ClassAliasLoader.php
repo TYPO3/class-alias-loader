@@ -136,16 +136,15 @@ class ClassAliasLoader
      * @param string $className
      * @return bool|null
      */
-    public function loadClass($className)
-    {
-        if (!$this->caseSensitiveClassLoading) {
+    public function loadClass($className) {
+        $classFound = $this->composerClassLoader->loadClass($className);
+        if (!$classFound && !$this->caseSensitiveClassLoading) {
             $lowerCasedClassName = strtolower($className);
             if ($this->composerClassLoader->findFile($lowerCasedClassName)) {
-                return $this->composerClassLoader->loadClass($lowerCasedClassName);
+                $classFound = $this->composerClassLoader->loadClass($lowerCasedClassName);
             }
         }
-
-        return $this->composerClassLoader->loadClass($className);
+        return $classFound;
     }
 
     /**
