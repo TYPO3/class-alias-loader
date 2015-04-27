@@ -18,8 +18,19 @@ use Composer\Util\Filesystem;
  */
 class ClassAliasGenerator {
 
-
-	static public function generateAliasMap(\Composer\Script\Event $event) {
+	/**
+	 * @param \Composer\Script\Event $event
+	 * @param bool $calledByPlugin
+	 * @return bool
+	 * @throws \Exception
+	 */
+	static public function generateAliasMap(\Composer\Script\Event $event, $calledByPlugin = false) {
+		if (!$calledByPlugin) {
+			$event->getIO()->write('
+<warning>Please remove the section "post-autoload-dump": "Helhum\\ClassAliasLoader\\Composer\\ClassAliasGenerator::generateAliasMap" from your composer.json! It is obsolete.</warning>
+');
+			return false;
+		}
 		$event->getIO()->write('<info>Generating class alias map files</info>');
 
 		$composer = $event->getComposer();
