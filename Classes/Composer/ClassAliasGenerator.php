@@ -122,13 +122,14 @@ class ClassAliasLoaderInit$suffix {
 		if (null !== self::\$loader) {
 			return self::\$loader;
 		}
-		\$composerClassLoader->unregister();
+
 		\$aliasClassLoader = new Helhum\ClassAliasLoader\Composer\ClassAliasLoader(\$composerClassLoader);
 
 		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
 		\$aliasClassLoader->setAliasMap(\$classAliasMap);
 		\$aliasClassLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
 		spl_autoload_register(array(\$aliasClassLoader, 'loadClassWithAlias'), true, true);
+		\$composerClassLoader->unregister();
 
 		self::\$loader = \$aliasClassLoader;
 
