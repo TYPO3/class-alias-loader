@@ -129,7 +129,6 @@ class ClassAliasLoaderInit$suffix {
 		\$aliasClassLoader->setAliasMap(\$classAliasMap);
 		\$aliasClassLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
 		spl_autoload_register(array(\$aliasClassLoader, 'loadClassWithAlias'), true, true);
-		\$composerClassLoader->unregister();
 
 		self::\$loader = \$aliasClassLoader;
 
