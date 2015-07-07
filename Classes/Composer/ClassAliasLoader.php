@@ -36,7 +36,6 @@ class ClassAliasLoader {
 	 * @param ComposerClassLoader $composerClassLoader
 	 */
 	public function __construct(ComposerClassLoader $composerClassLoader) {
-		$composerClassLoader->unregister();
 		$this->composerClassLoader = $composerClassLoader;
 	}
 
@@ -78,6 +77,23 @@ class ClassAliasLoader {
 	public function getClassNameForAlias($alias) {
 		$lookUpClassName = strtolower($alias);
 		return isset($this->aliasMap['aliasToClassNameMapping'][$lookUpClassName]) ? $this->aliasMap['aliasToClassNameMapping'][$lookUpClassName] : $alias;
+	}
+
+	/**
+	 * Registers this instance as an autoloader.
+	 *
+	 * @param bool $prepend Whether to prepend the autoloader or not
+	 */
+	public function register($prepend = false) {
+		$this->composerClassLoader->unregister();
+		spl_autoload_register(array($this, 'loadClassWithAlias'), true, $prepend);
+	}
+
+	/**
+	 * Unregisters this instance as an autoloader.
+	 */
+	public function unregister() {
+		spl_autoload_unregister(array($this, 'loadClassWithAlias'));
 	}
 
 	/**

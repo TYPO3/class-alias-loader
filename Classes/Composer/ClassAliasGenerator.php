@@ -108,6 +108,7 @@ class ClassAliasGenerator {
 			$suffix = $config->get('autoloader-suffix') ?: md5(uniqid('', true));
 		}
 
+		$prependAutoloader = $config->get('prepend-autoloader') === false ? 'false' : 'true';
 
 		$aliasLoaderInitClassContent = <<<EOF
 <?php
@@ -128,7 +129,7 @@ class ClassAliasLoaderInit$suffix {
 		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
 		\$aliasClassLoader->setAliasMap(\$classAliasMap);
 		\$aliasClassLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
-		spl_autoload_register(array(\$aliasClassLoader, 'loadClassWithAlias'), true, true);
+		\$aliasClassLoader->register($prependAutoloader);
 
 		self::\$loader = \$aliasClassLoader;
 
