@@ -73,7 +73,7 @@ class ClassAliasGenerator
             }
         }
 
-        if (!$mappingFound) {
+        if (!$mappingFound && $caseSensitiveClassLoading === true) {
             return false;
         }
 
