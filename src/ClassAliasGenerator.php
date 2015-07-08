@@ -142,7 +142,7 @@ EOF;
             self::rewriteClassMapWithLowerCaseClassNames($targetDir);
         }
 
-        $event->getIO()->write('<info>Insert class alias loader into main autoload.php file</info>');
+        $event->getIO()->write('<info>Inserting class alias loader into main autoload.php file</info>');
         static::modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
         return true;
