@@ -78,7 +78,7 @@ class ClassAliasGenerator
         if (!$classAliasMappingFound && $caseSensitiveClassLoading) {
             return false;
         }
-
+        $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
         $event->getIO()->write('<info>Generating class alias map file</info>');
         self::generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
@@ -114,7 +114,7 @@ class ClassAliasLoaderInit$suffix {
 
 		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
 		\$classAliasLoader->setAliasMap(\$classAliasMap);
-		\$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
+		\$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
 		\$classAliasLoader->register($prependAutoloader);
 
 		self::\$loader = \$classAliasLoader;
