@@ -159,10 +159,10 @@ EOF;
                 'class-alias-maps' => array(),
                 'autoload-case-sensitivity' => true
         );
-        if (!empty($extraConfig['helhum/class-alias-loader']['class-alias-maps'])) {
+        if (isset($extraConfig['helhum/class-alias-loader']['class-alias-maps'])) {
             $aliasLoaderConfig['class-alias-maps'] = $extraConfig['helhum/class-alias-loader']['class-alias-maps'];
         }
-        if (!empty($extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'])) {
+        if (isset($extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'])) {
             $aliasLoaderConfig['autoload-case-sensitivity'] = (bool)$extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'];
         }
 
