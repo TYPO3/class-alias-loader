@@ -10,6 +10,7 @@ namespace Helhum\ClassAliasLoader;
  * file that was distributed with this source code.
  */
 
+use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Util\Filesystem;
 
@@ -40,20 +41,18 @@ class ClassAliasGenerator
         $localRepo = $composer->getRepositoryManager()->getLocalRepository();
         $packageMap = $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
 
-        $caseSensitiveClassLoading = self::caseSensitiveClassLoading($mainPackage, $targetDir) ? 'true' : 'false';
-
         $aliasToClassNameMapping = array();
         $classNameToAliasMapping = array();
-        $mappingFound = false;
+        $classAliasMappingFound = false;
 
         foreach ($packageMap as $item) {
             list($package, $installPath) = $item;
-            $extra = $package->getExtra();
-            if (!empty($extra['class-alias-maps'])) {
-                if (!is_array($extra['class-alias-maps'])) {
+            $aliasLoaderConfig = self::getAliasLoaderConfigFromPackage($package);
+            if (!empty($aliasLoaderConfig['class-alias-maps'])) {
+                if (!is_array($aliasLoaderConfig['class-alias-maps'])) {
                     throw new \Exception('"class-alias-maps" must be an array');
                 }
-                foreach ($extra['class-alias-maps'] as $mapFile) {
+                foreach ($aliasLoaderConfig['class-alias-maps'] as $mapFile) {
                     $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
                     if (is_file($mapFilePath)) {
                         $packageAliasMap = require $mapFilePath;
@@ -61,7 +60,7 @@ class ClassAliasGenerator
                             throw new \Exception('"class alias maps" must return an array', 1422625075);
                         }
                         if (!empty($packageAliasMap)) {
-                            $mappingFound = true;
+                            $classAliasMappingFound = true;
                         }
                         foreach ($packageAliasMap as $aliasClassName => $className) {
                             $lowerCasedAliasClassName = strtolower($aliasClassName);
@@ -73,12 +72,14 @@ class ClassAliasGenerator
             }
         }
 
-        if (!$mappingFound && $caseSensitiveClassLoading === true) {
+        $mainPackageAliasLoaderConfig = self::getAliasLoaderConfigFromPackage($mainPackage);
+        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig['autoload-case-sensitivity'];
+
+        if (!$classAliasMappingFound && !$caseSensitiveClassLoading) {
             return false;
         }
 
-        $event->getIO()
-              ->write('<info>Generating class alias map files</info>');
+        $event->getIO()->write('<info>Writing class alias map file</info>');
 
         $exportArray = array(
                 'aliasToClassNameMapping' => $aliasToClassNameMapping,
@@ -134,14 +135,39 @@ class ClassAliasLoaderInit$suffix {
 }
 
 EOF;
-
         file_put_contents($targetDir . '/autoload_alias_loader_real.php', $aliasLoaderInitClassContent);
 
+        if (!$caseSensitiveClassLoading) {
+            $event->getIO()->write('<info>Re-writing class map to support case insensitive class loading</info>');
+            self::rewriteClassMapWithLowerCaseClassNames($targetDir);
+        }
+
+        $event->getIO()->write('<info>Insert class alias loader into main autoload.php file</info>');
         static::modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
         return true;
     }
 
+    /**
+     * @param PackageInterface $package
+     * @return array
+     */
+    static protected function getAliasLoaderConfigFromPackage(PackageInterface $package)
+    {
+        $extraConfig = $package->getExtra();
+        $aliasLoaderConfig = array(
+                'class-alias-maps' => array(),
+                'autoload-case-sensitivity' => true
+        );
+        if (!empty($extraConfig['helhum/class-alias-loader']['class-alias-maps'])) {
+            $aliasLoaderConfig['class-alias-maps'] = $extraConfig['helhum/class-alias-loader']['class-alias-maps'];
+        }
+        if (!empty($extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'])) {
+            $aliasLoaderConfig['autoload-case-sensitivity'] = (bool)$extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'];
+        }
+
+        return $aliasLoaderConfig;
+    }
     /**
      * @param $autoloadFile
      * @param string $suffix
@@ -171,25 +197,14 @@ EOF;
      * Rewrites the class map to have lowercased keys to be able to load classes with wrong casing
      * Defaults to case sensitivity (composer loader default)
      *
-     * @param RootPackageInterface $mainPackage
      * @param string $targetDir
-     * @return bool
      */
-    static protected function caseSensitiveClassLoading(RootPackageInterface $mainPackage, $targetDir)
+    static protected function rewriteClassMapWithLowerCaseClassNames($targetDir)
     {
-        $extra = $mainPackage->getExtra();
-        $caseSensitiveClassLoading = true;
-        if (isset($extra['autoload-case-sensitivity'])) {
-            $caseSensitiveClassLoading = (bool)$extra['autoload-case-sensitivity'];
-        }
-        if (!$caseSensitiveClassLoading) {
-            $classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
-            $classMapContents = preg_replace_callback('/    \'[^\']*\' => /', function ($match) {
-                return strtolower($match[0]);
-            }, $classMapContents);
-            file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
-        }
-
-        return $caseSensitiveClassLoading;
+        $classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
+        $classMapContents = preg_replace_callback('/    \'[^\']*\' => /', function ($match) {
+            return strtolower($match[0]);
+        }, $classMapContents);
+        file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
     }
 }
