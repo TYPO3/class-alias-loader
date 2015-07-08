@@ -31,8 +31,6 @@ class ClassAliasGenerator {
 ');
 			return false;
 		}
-		$event->getIO()->write('<info>Generating class alias map files</info>');
-
 		$composer = $event->getComposer();
 		$config = $composer->getConfig();
 
@@ -84,6 +82,8 @@ class ClassAliasGenerator {
 		if (!$mappingFound) {
 			return false;
 		}
+
+		$event->getIO()->write('<info>Generating class alias map files</info>');
 
 		$exportArray = array(
 			'aliasToClassNameMapping' => $aliasToClassNameMapping,
