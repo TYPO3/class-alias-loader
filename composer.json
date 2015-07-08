@@ -14,7 +14,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Helhum\\ClassAliasLoader\\": "Classes/"}
+        "psr-4": { "Helhum\\ClassAliasLoader\\": "src/"}
     },
     "require": {
         "composer-plugin-api": "^1.0"
