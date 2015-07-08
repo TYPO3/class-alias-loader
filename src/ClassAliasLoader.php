@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\ClassAliasLoader\Composer;
+namespace Helhum\ClassAliasLoader;
 
 /*
  * This file is part of the class alias loader package.

@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\ClassAliasLoader\Composer;
+namespace Helhum\ClassAliasLoader;
 
 /*
  * This file is part of the class alias loader package.
@@ -20,18 +20,11 @@ class ClassAliasGenerator
 {
     /**
      * @param \Composer\Script\Event $event
-     * @param bool $calledByPlugin
      * @return bool
      * @throws \Exception
      */
-    static public function generateAliasMap(\Composer\Script\Event $event, $calledByPlugin = false)
+    static public function generateAliasMap(\Composer\Script\Event $event)
     {
-        if (!$calledByPlugin) {
-            $event->getIO()
-                  ->write('<warning>Please remove the section "post-autoload-dump": "Helhum\\ClassAliasLoader\\Composer\\ClassAliasGenerator::generateAliasMap" from your composer.json! It is obsolete.</warning>');
-            return false;
-        }
-
         $composer = $event->getComposer();
         $config = $composer->getConfig();
 
@@ -126,7 +119,7 @@ class ClassAliasLoaderInit$suffix {
 			return self::\$loader;
 		}
 
-		\$aliasClassLoader = new Helhum\ClassAliasLoader\Composer\ClassAliasLoader(\$composerClassLoader);
+		\$aliasClassLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
 
 		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
 		\$aliasClassLoader->setAliasMap(\$classAliasMap);

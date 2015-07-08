@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\ClassAliasLoader\Composer;
+namespace Helhum\ClassAliasLoader;
 
 /*
  * This file is part of the class alias loader package.
@@ -75,7 +75,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostAutoloadDump(\Composer\Script\Event $event)
     {
-        return ClassAliasGenerator::generateAliasMap($event, true);
+        return ClassAliasGenerator::generateAliasMap($event);
     }
 
 }
