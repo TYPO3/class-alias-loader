@@ -79,7 +79,7 @@ class ClassAliasGenerator
             return false;
         }
 
-        $event->getIO()->write('<info>Writing class alias map file</info>');
+        $event->getIO()->write('<info>Generating class alias map file</info>');
 
         $exportArray = array(
                 'aliasToClassNameMapping' => $aliasToClassNameMapping,
