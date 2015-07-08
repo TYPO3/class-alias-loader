@@ -80,17 +80,7 @@ class ClassAliasGenerator
         }
 
         $event->getIO()->write('<info>Generating class alias map file</info>');
-
-        $exportArray = array(
-                'aliasToClassNameMapping' => $aliasToClassNameMapping,
-                'classNameToAliasMapping' => $classNameToAliasMapping
-        );
-
-        $fileContent = '<?php' . chr(10) . 'return ';
-        $fileContent .= var_export($exportArray, true);
-        $fileContent .= ';';
-
-        file_put_contents($targetDir . '/autoload_classaliasmap.php', $fileContent);
+        self::generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
         $suffix = null;
         if (!$config->get('autoloader-suffix') && is_readable($vendorPath . '/autoload.php')) {
@@ -168,6 +158,7 @@ EOF;
 
         return $aliasLoaderConfig;
     }
+
     /**
      * @param $autoloadFile
      * @param string $suffix
@@ -194,6 +185,25 @@ EOF;
     }
 
     /**
+     * @param array $aliasToClassNameMapping
+     * @param array $classNameToAliasMapping
+     * @param string $targetDir
+     */
+    static protected function generateAliasMapFile(array $aliasToClassNameMapping, array $classNameToAliasMapping, $targetDir)
+    {
+        $exportArray = array(
+                'aliasToClassNameMapping' => $aliasToClassNameMapping,
+                'classNameToAliasMapping' => $classNameToAliasMapping
+        );
+
+        $fileContent = '<?php' . chr(10) . 'return ';
+        $fileContent .= var_export($exportArray, true);
+        $fileContent .= ';';
+
+        file_put_contents($targetDir . '/autoload_classaliasmap.php', $fileContent);
+    }
+
+    /**
      * Rewrites the class map to have lowercased keys to be able to load classes with wrong casing
      * Defaults to case sensitivity (composer loader default)
      *
@@ -207,4 +217,5 @@ EOF;
         }, $classMapContents);
         file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
     }
+
 }
