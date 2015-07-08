@@ -75,7 +75,7 @@ class ClassAliasGenerator
         $mainPackageAliasLoaderConfig = self::getAliasLoaderConfigFromPackage($mainPackage);
         $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig['autoload-case-sensitivity'];
 
-        if (!$classAliasMappingFound && !$caseSensitiveClassLoading) {
+        if (!$classAliasMappingFound && $caseSensitiveClassLoading) {
             return false;
         }
 
