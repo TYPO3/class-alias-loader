@@ -119,16 +119,16 @@ class ClassAliasLoaderInit$suffix {
 			return self::\$loader;
 		}
 
-		\$aliasClassLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
+		\$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
 
 		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
-		\$aliasClassLoader->setAliasMap(\$classAliasMap);
-		\$aliasClassLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
-		\$aliasClassLoader->register($prependAutoloader);
+		\$classAliasLoader->setAliasMap(\$classAliasMap);
+		\$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoading);
+		\$classAliasLoader->register($prependAutoloader);
 
-		self::\$loader = \$aliasClassLoader;
+		self::\$loader = \$classAliasLoader;
 
-		return \$aliasClassLoader;
+		return \$classAliasLoader;
 
 	}
 }
