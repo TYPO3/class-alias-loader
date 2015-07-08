@@ -16,101 +16,103 @@ use Composer\Util\Filesystem;
 /**
  * Class ClassAliasLoader
  */
-class ClassAliasGenerator {
+class ClassAliasGenerator
+{
+    /**
+     * @param \Composer\Script\Event $event
+     * @param bool $calledByPlugin
+     * @return bool
+     * @throws \Exception
+     */
+    static public function generateAliasMap(\Composer\Script\Event $event, $calledByPlugin = false)
+    {
+        if (!$calledByPlugin) {
+            $event->getIO()
+                  ->write('<warning>Please remove the section "post-autoload-dump": "Helhum\\ClassAliasLoader\\Composer\\ClassAliasGenerator::generateAliasMap" from your composer.json! It is obsolete.</warning>');
+            return false;
+        }
 
-	/**
-	 * @param \Composer\Script\Event $event
-	 * @param bool $calledByPlugin
-	 * @return bool
-	 * @throws \Exception
-	 */
-	static public function generateAliasMap(\Composer\Script\Event $event, $calledByPlugin = false) {
-		if (!$calledByPlugin) {
-			$event->getIO()->write('
-<warning>Please remove the section "post-autoload-dump": "Helhum\\ClassAliasLoader\\Composer\\ClassAliasGenerator::generateAliasMap" from your composer.json! It is obsolete.</warning>
-');
-			return false;
-		}
-		$composer = $event->getComposer();
-		$config = $composer->getConfig();
+        $composer = $event->getComposer();
+        $config = $composer->getConfig();
 
-		$filesystem = new Filesystem();
-		$filesystem->ensureDirectoryExists($config->get('vendor-dir'));
-		$basePath = $filesystem->normalizePath(realpath(getcwd()));
-		$vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
-		$targetDir = $vendorPath . '/composer';
-		$filesystem->ensureDirectoryExists($targetDir);
+        $filesystem = new Filesystem();
+        $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
+        $basePath = $filesystem->normalizePath(realpath(getcwd()));
+        $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
+        $targetDir = $vendorPath . '/composer';
+        $filesystem->ensureDirectoryExists($targetDir);
 
-		$mainPackage = $composer->getPackage();
-		$autoLoadGenerator = $composer->getAutoloadGenerator();
-		$localRepo = $composer->getRepositoryManager()->getLocalRepository();
-		$packageMap = $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
+        $mainPackage = $composer->getPackage();
+        $autoLoadGenerator = $composer->getAutoloadGenerator();
+        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+        $packageMap = $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
 
-		$caseSensitiveClassLoading = self::caseSensitiveClassLoading($mainPackage, $targetDir) ? 'true' : 'false';
+        $caseSensitiveClassLoading = self::caseSensitiveClassLoading($mainPackage, $targetDir) ? 'true' : 'false';
 
-		$aliasToClassNameMapping = array();
-		$classNameToAliasMapping = array();
-		$mappingFound = false;
+        $aliasToClassNameMapping = array();
+        $classNameToAliasMapping = array();
+        $mappingFound = false;
 
-		foreach ($packageMap as $item) {
-			list($package, $installPath) = $item;
-			$extra = $package->getExtra();
-			if (!empty($extra['class-alias-maps'])) {
-				if (!is_array($extra['class-alias-maps'])) {
-					throw new \Exception('"class-alias-maps" must be an array');
-				}
-				foreach ($extra['class-alias-maps'] as $mapFile) {
-					$mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
-					if (is_file($mapFilePath)) {
-						$packageAliasMap = require $mapFilePath;
-						if (!is_array($packageAliasMap)) {
-							throw new \Exception('"class alias maps" must return an array', 1422625075);
-						}
-						if (!empty($packageAliasMap)) {
-							$mappingFound = true;
-						}
-						foreach ($packageAliasMap as $aliasClassName => $className) {
-							$lowerCasedAliasClassName = strtolower($aliasClassName);
-							$aliasToClassNameMapping[$lowerCasedAliasClassName] = $className;
-							$classNameToAliasMapping[$className][$lowerCasedAliasClassName] = $lowerCasedAliasClassName;
-						}
-					}
-				}
-			}
-		}
+        foreach ($packageMap as $item) {
+            list($package, $installPath) = $item;
+            $extra = $package->getExtra();
+            if (!empty($extra['class-alias-maps'])) {
+                if (!is_array($extra['class-alias-maps'])) {
+                    throw new \Exception('"class-alias-maps" must be an array');
+                }
+                foreach ($extra['class-alias-maps'] as $mapFile) {
+                    $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
+                    if (is_file($mapFilePath)) {
+                        $packageAliasMap = require $mapFilePath;
+                        if (!is_array($packageAliasMap)) {
+                            throw new \Exception('"class alias maps" must return an array', 1422625075);
+                        }
+                        if (!empty($packageAliasMap)) {
+                            $mappingFound = true;
+                        }
+                        foreach ($packageAliasMap as $aliasClassName => $className) {
+                            $lowerCasedAliasClassName = strtolower($aliasClassName);
+                            $aliasToClassNameMapping[$lowerCasedAliasClassName] = $className;
+                            $classNameToAliasMapping[$className][$lowerCasedAliasClassName] = $lowerCasedAliasClassName;
+                        }
+                    }
+                }
+            }
+        }
 
-		if (!$mappingFound) {
-			return false;
-		}
+        if (!$mappingFound) {
+            return false;
+        }
 
-		$event->getIO()->write('<info>Generating class alias map files</info>');
+        $event->getIO()
+              ->write('<info>Generating class alias map files</info>');
 
-		$exportArray = array(
-			'aliasToClassNameMapping' => $aliasToClassNameMapping,
-			'classNameToAliasMapping' => $classNameToAliasMapping
-		);
+        $exportArray = array(
+                'aliasToClassNameMapping' => $aliasToClassNameMapping,
+                'classNameToAliasMapping' => $classNameToAliasMapping
+        );
 
-		$fileContent = '<?php' . chr(10) . 'return ';
-		$fileContent .= var_export($exportArray, true);
-		$fileContent .= ';';
+        $fileContent = '<?php' . chr(10) . 'return ';
+        $fileContent .= var_export($exportArray, true);
+        $fileContent .= ';';
 
-		file_put_contents($targetDir . '/autoload_classaliasmap.php', $fileContent);
+        file_put_contents($targetDir . '/autoload_classaliasmap.php', $fileContent);
 
-		$suffix = NULL;
-		if (!$config->get('autoloader-suffix') && is_readable($vendorPath . '/autoload.php')) {
-			$content = file_get_contents($vendorPath.'/autoload.php');
-			if (preg_match('{ComposerAutoloaderInit([^:\s]+)::}', $content, $match)) {
-				$suffix = $match[1];
-			}
-		}
+        $suffix = null;
+        if (!$config->get('autoloader-suffix') && is_readable($vendorPath . '/autoload.php')) {
+            $content = file_get_contents($vendorPath . '/autoload.php');
+            if (preg_match('{ComposerAutoloaderInit([^:\s]+)::}', $content, $match)) {
+                $suffix = $match[1];
+            }
+        }
 
-		if (!$suffix) {
-			$suffix = $config->get('autoloader-suffix') ?: md5(uniqid('', true));
-		}
+        if (!$suffix) {
+            $suffix = $config->get('autoloader-suffix') ?: md5(uniqid('', true));
+        }
 
-		$prependAutoloader = $config->get('prepend-autoloader') === false ? 'false' : 'true';
+        $prependAutoloader = $config->get('prepend-autoloader') === false ? 'false' : 'true';
 
-		$aliasLoaderInitClassContent = <<<EOF
+        $aliasLoaderInitClassContent = <<<EOF
 <?php
 
 // autoload_alias_loader_real.php @generated by helhum/class-alias-loader
@@ -140,23 +142,24 @@ class ClassAliasLoaderInit$suffix {
 
 EOF;
 
-		file_put_contents($targetDir . '/autoload_alias_loader_real.php', $aliasLoaderInitClassContent);
+        file_put_contents($targetDir . '/autoload_alias_loader_real.php', $aliasLoaderInitClassContent);
 
-		static::modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
+        static::modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * @param $autoloadFile
-	 * @param string $suffix
-	 */
-	static protected function modifyMainAutoloadFile($autoloadFile, $suffix) {
-		$originalAutoloadFileContent = file_get_contents($autoloadFile);
-		preg_match('/return ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
-		$originalAutoloadFileContent = str_replace($matches[0], '', $originalAutoloadFileContent);
-		$composerClassLoaderInit = str_replace(array('return ', ';'), '', $matches[0]);
-		$autoloadFileContent = <<<EOF
+    /**
+     * @param $autoloadFile
+     * @param string $suffix
+     */
+    static protected function modifyMainAutoloadFile($autoloadFile, $suffix)
+    {
+        $originalAutoloadFileContent = file_get_contents($autoloadFile);
+        preg_match('/return ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
+        $originalAutoloadFileContent = str_replace($matches[0], '', $originalAutoloadFileContent);
+        $composerClassLoaderInit = str_replace(array('return ', ';'), '', $matches[0]);
+        $autoloadFileContent = <<<EOF
 $originalAutoloadFileContent
 
 // autoload.php @generated by helhum/class-alias-loader
@@ -167,35 +170,33 @@ return ClassAliasLoaderInit$suffix::getAliasLoader($composerClassLoaderInit);
 
 EOF;
 
-		file_put_contents($autoloadFile, $autoloadFileContent);
+        file_put_contents($autoloadFile, $autoloadFileContent);
 
-	}
+    }
 
-	/**
-	 * Rewrites the class map to have lowercased keys to be able to load classes with wrong casing
-	 * Defaults to case sensitivity (composer loader default)
-	 *
-	 * @param RootPackageInterface $mainPackage
-	 * @param string $targetDir
-	 * @return bool
-	 */
-	static protected function caseSensitiveClassLoading(RootPackageInterface $mainPackage, $targetDir) {
-		$extra = $mainPackage->getExtra();
-		$caseSensitiveClassLoading = true;
-		if (isset($extra['autoload-case-sensitivity'])) {
-			$caseSensitiveClassLoading = (bool)$extra['autoload-case-sensitivity'];
-		}
-		if (!$caseSensitiveClassLoading) {
-			$classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
-			$classMapContents = preg_replace_callback(
-				'/    \'[^\']*\' => /',
-				function($match) {
-					return strtolower($match[0]);
-				},
-				$classMapContents
-			);
-			file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
-		}
-		return $caseSensitiveClassLoading;
-	}
+    /**
+     * Rewrites the class map to have lowercased keys to be able to load classes with wrong casing
+     * Defaults to case sensitivity (composer loader default)
+     *
+     * @param RootPackageInterface $mainPackage
+     * @param string $targetDir
+     * @return bool
+     */
+    static protected function caseSensitiveClassLoading(RootPackageInterface $mainPackage, $targetDir)
+    {
+        $extra = $mainPackage->getExtra();
+        $caseSensitiveClassLoading = true;
+        if (isset($extra['autoload-case-sensitivity'])) {
+            $caseSensitiveClassLoading = (bool)$extra['autoload-case-sensitivity'];
+        }
+        if (!$caseSensitiveClassLoading) {
+            $classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
+            $classMapContents = preg_replace_callback('/    \'[^\']*\' => /', function ($match) {
+                return strtolower($match[0]);
+            }, $classMapContents);
+            file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
+        }
+
+        return $caseSensitiveClassLoading;
+    }
 }
