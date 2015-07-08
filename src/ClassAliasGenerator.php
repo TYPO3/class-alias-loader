@@ -129,6 +129,11 @@ EOF;
 
         if (!$caseSensitiveClassLoading) {
             $event->getIO()->write('<info>Re-writing class map to support case insensitive class loading</info>');
+            $flags = $event->getFlags();
+            $optimize = !empty($flags['optimize']) || $config->get('optimize-autoloader') || $config->get('classmap-authoritative');
+            if (!$optimize) {
+                $event->getIO()->write('<warning>Case insensitive class loading only works reliably if you use the optimize class loading feature of composer</warning>');
+            }
             self::rewriteClassMapWithLowerCaseClassNames($targetDir);
         }
 
