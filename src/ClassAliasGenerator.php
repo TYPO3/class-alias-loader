@@ -141,6 +141,7 @@ EOF;
     /**
      * @param PackageInterface $package
      * @return array
+     * @TODO: refactor into own config object
      */
     static protected function getAliasLoaderConfigFromPackage(PackageInterface $package)
     {
