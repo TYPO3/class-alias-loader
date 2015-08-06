@@ -2,9 +2,6 @@ language: php
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - php: 7
-
   include:
     - php: 5.3
       env: UNIT_TESTS=yes
