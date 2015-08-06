@@ -112,18 +112,8 @@ class ClassAliasLoader
      */
     public function loadClassWithAlias($className)
     {
-        $lowerCasedClassName = strtolower($className);
-        // Is an original class which has an alias
-        if (isset($this->aliasMap['classNameToAliasMapping'][$className])) {
-            return $this->loadOriginalClassAndSetAliases($className);
-            // Is an alias (we're graceful regarding casing for alias definitions)
-        } elseif (isset($this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName])) {
-            $originalClassName = $this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName];
-
-            return $this->loadOriginalClassAndSetAliases($originalClassName);
-        }
-
-        return $this->loadClass($className);
+        $originalClassName = $this->getOriginalClassName($className);
+        return $originalClassName ? $this->loadOriginalClassAndSetAliases($originalClassName) : $this->loadClass($className);
     }
 
     /**
@@ -138,6 +128,28 @@ class ClassAliasLoader
             $classFound = $this->composerClassLoader->loadClass(strtolower($className));
         }
         return $classFound;
+    }
+
+    /**
+     * Looks up the original class name from the alias map
+     *
+     * @param string $aliasOrClassName
+     * @return string|NULL NULL if no alias mapping is found or the original class name as string
+     */
+    protected function getOriginalClassName($aliasOrClassName)
+    {
+        // Is an original class which has an alias
+        if (array_key_exists($aliasOrClassName, $this->aliasMap['classNameToAliasMapping'])) {
+            return $aliasOrClassName;
+        }
+
+        // Is an alias (we're graceful regarding casing for alias definitions)
+        $lowerCasedClassName = strtolower($aliasOrClassName);
+        if (array_key_exists($lowerCasedClassName, $this->aliasMap['aliasToClassNameMapping'])) {
+            return $this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName];
+        }
+        // No alias registered for this class name, return and remember that info
+        return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = NULL;
     }
 
     /**
