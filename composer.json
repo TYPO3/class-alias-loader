@@ -16,12 +16,17 @@
     "autoload": {
         "psr-4": { "Helhum\\ClassAliasLoader\\": "src/"}
     },
+    "autoload-dev": {
+        "psr-4": { "Helhum\\ClassAliasLoader\\Tests\\": "tests/"}
+    },
     "require": {
         "php": ">=5.3.7",
         "composer-plugin-api": "^1.0"
     },
     "require-dev": {
-        "composer/composer": "dev-master"
+        "composer/composer": "dev-master",
+        "mikey179/vfsStream": "1.4.*@dev",
+        "phpunit/phpunit": "~4.7.0"
     },
     "extra": {
         "class": "Helhum\\ClassAliasLoader\\Plugin",

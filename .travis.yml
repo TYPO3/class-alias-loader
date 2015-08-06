@@ -1,0 +1,38 @@
+language: php
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: 7
+
+  include:
+    - php: 5.3
+      env: UNIT_TESTS=yes
+    - php: 5.5
+      env: UNIT_TESTS=yes
+    - php: 5.6
+      env: UNIT_TESTS=yes
+    - php: 7
+      env: UNIT_TESTS=yes
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+env:
+  global:
+    secure: hL/ws+UJCh7H910RdJiT8A/TJ1DohXP1HnHbO7xhXYMA0PCgbPNDrRk8gD216IKqv+Zq1Pt7szDWlK017d7gwKhk1QJkRho96O9ZpEm795ARg7TR21sHx9jjvznD7cuL7c/nWyfIscEE3D9Bm+xn9IPxG6rYegYEBR1X9e1cGfM=
+
+before_script:
+  - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
+  - composer install
+
+script:
+  - >
+    if [[ "$UNIT_TESTS" == "yes" ]]; then
+      echo;
+      echo "Running unit tests";
+      vendor/bin/phpunit --colors tests/Unit/
+    fi
