@@ -112,10 +112,6 @@ class ClassAliasLoader
      */
     public function loadClassWithAlias($className)
     {
-        // Work around for PHP 5.3.0 - 5.3.2 https://bugs.php.net/50731
-        if ('\\' === $className[0]) {
-            $className = substr($className, 1);
-        }
         $lowerCasedClassName = strtolower($className);
         // Is an original class which has an alias
         if (isset($this->aliasMap['classNameToAliasMapping'][$className])) {
