@@ -162,7 +162,7 @@ class ClassAliasLoader
      * class files were included or aliases were set manually in userland code.
      *
      * @param string $originalClassName
-     * @return bool
+     * @return bool|null
      */
     protected function loadOriginalClassAndSetAliases($originalClassName)
     {
@@ -176,7 +176,7 @@ class ClassAliasLoader
             return true;
         }
 
-        return false;
+        return null;
     }
 
     /**
