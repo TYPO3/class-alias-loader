@@ -26,7 +26,10 @@ class ClassAliasLoader
     /**
      * @var array
      */
-    protected $aliasMap = array();
+    protected $aliasMap = array(
+        'aliasToClassNameMapping' => array(),
+        'classNameToAliasMapping' => array()
+    );
 
     /**
      * @var bool
