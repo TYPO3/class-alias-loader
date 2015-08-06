@@ -79,8 +79,10 @@ class ClassAliasGenerator
         $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig['autoload-case-sensitivity'];
 
         if (!$classAliasMappingFound && $caseSensitiveClassLoading) {
+            // No mapping found in any package and no insensitive class loading active. We return early and skip rewriting
             return false;
         }
+
         $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
         $event->getIO()->write('<info>Generating class alias map file</info>');
         self::generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
