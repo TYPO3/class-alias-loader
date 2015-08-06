@@ -15,7 +15,10 @@ use Composer\Package\RootPackageInterface;
 use Composer\Util\Filesystem;
 
 /**
- * Class ClassAliasLoader
+ * This class loops over all packages that are installed by composer and
+ * looks for configured class alias maps (in composer.json).
+ * If at least one is found, the vendor/autoload.php file is rewritten to amend the composer class loader.
+ * Otherwise it does nothing.
  */
 class ClassAliasGenerator
 {
@@ -105,7 +108,7 @@ class ClassAliasLoaderInit$suffix {
 
     private static \$loader;
 
-    static public function getAliasLoader(\$composerClassLoader) {
+    public static function getAliasLoader(\$composerClassLoader) {
         if (null !== self::\$loader) {
             return self::\$loader;
         }

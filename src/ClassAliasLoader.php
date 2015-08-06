@@ -13,7 +13,8 @@ namespace Helhum\ClassAliasLoader;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 
 /**
- * Class ClassAliasLoader
+ * The main class loader that amends the composer class loader.
+ * It deals with the alias maps and the case insensitive class loading if configured.
  */
 class ClassAliasLoader
 {
