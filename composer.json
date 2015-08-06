@@ -17,6 +17,7 @@
         "psr-4": { "Helhum\\ClassAliasLoader\\": "src/"}
     },
     "require": {
+        "php": ">=5.3.7",
         "composer-plugin-api": "^1.0"
     },
     "require-dev": {
