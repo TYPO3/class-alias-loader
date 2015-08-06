@@ -69,24 +69,24 @@ class ClassAliasLoader
      */
     public function addAliasMap(array $aliasMap)
     {
-        foreach ($aliasMap['aliasToClassNameMapping'] as $alias => $class) {
+        foreach ($aliasMap['aliasToClassNameMapping'] as $alias => $originalClassName) {
             $lowerCaseAlias = strtolower($alias);
-            $this->aliasMap['aliasToClassNameMapping'][$lowerCaseAlias] = $class;
-            $this->aliasMap['classNameToAliasMapping'][$class][$lowerCaseAlias] = $lowerCaseAlias;
+            $this->aliasMap['aliasToClassNameMapping'][$lowerCaseAlias] = $originalClassName;
+            $this->aliasMap['classNameToAliasMapping'][$originalClassName][$lowerCaseAlias] = $lowerCaseAlias;
         }
     }
 
     /**
      * Get final class name of alias
      *
-     * @param string $alias
+     * @param string $aliasOrClassName
      * @return string
      */
-    public function getClassNameForAlias($alias)
+    public function getClassNameForAlias($aliasOrClassName)
     {
-        $lookUpClassName = strtolower($alias);
+        $lookUpClassName = strtolower($aliasOrClassName);
 
-        return isset($this->aliasMap['aliasToClassNameMapping'][$lookUpClassName]) ? $this->aliasMap['aliasToClassNameMapping'][$lookUpClassName] : $alias;
+        return isset($this->aliasMap['aliasToClassNameMapping'][$lookUpClassName]) ? $this->aliasMap['aliasToClassNameMapping'][$lookUpClassName] : $aliasOrClassName;
     }
 
     /**
