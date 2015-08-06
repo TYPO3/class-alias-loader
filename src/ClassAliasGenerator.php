@@ -115,15 +115,15 @@ class ClassAliasLoaderInit$suffix {
 
         \$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
 
+        self::\$loader = \$classAliasLoader;
+        Helhum\ClassAliasLoader\ClassAliasMap::\$classAliasLoader = \$classAliasLoader;
+
         \$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
         \$classAliasLoader->setAliasMap(\$classAliasMap);
         \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
         \$classAliasLoader->register($prependAutoloader);
 
-        self::\$loader = \$classAliasLoader;
-
         return \$classAliasLoader;
-
     }
 }
 
