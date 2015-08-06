@@ -75,7 +75,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostAutoloadDump(\Composer\Script\Event $event)
     {
-        return ClassAliasGenerator::generateAliasMap($event);
+        return ClassAliasMapGenerator::generateAliasMap($event);
     }
 
 }

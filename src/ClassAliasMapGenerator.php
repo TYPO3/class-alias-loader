@@ -11,7 +11,6 @@ namespace Helhum\ClassAliasLoader;
  */
 
 use Composer\Package\PackageInterface;
-use Composer\Package\RootPackageInterface;
 use Composer\Util\Filesystem;
 
 /**
@@ -20,7 +19,7 @@ use Composer\Util\Filesystem;
  * If at least one is found, the vendor/autoload.php file is rewritten to amend the composer class loader.
  * Otherwise it does nothing.
  */
-class ClassAliasGenerator
+class ClassAliasMapGenerator
 {
     /**
      * @param \Composer\Script\Event $event
