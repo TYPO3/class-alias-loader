@@ -14,7 +14,7 @@ use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use Helhum\ClassAliasLoader\ClassAliasLoader;
 
 /**
- * Class ClassAliasLoader
+ * Test case for ClassAliasLoader
  */
 class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
 {
