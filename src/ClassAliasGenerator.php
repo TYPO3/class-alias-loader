@@ -103,25 +103,25 @@ class ClassAliasGenerator
 
 class ClassAliasLoaderInit$suffix {
 
-	private static \$loader;
+    private static \$loader;
 
-	static public function getAliasLoader(\$composerClassLoader) {
-		if (null !== self::\$loader) {
-			return self::\$loader;
-		}
+    static public function getAliasLoader(\$composerClassLoader) {
+        if (null !== self::\$loader) {
+            return self::\$loader;
+        }
 
-		\$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
+        \$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
 
-		\$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
-		\$classAliasLoader->setAliasMap(\$classAliasMap);
-		\$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
-		\$classAliasLoader->register($prependAutoloader);
+        \$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
+        \$classAliasLoader->setAliasMap(\$classAliasMap);
+        \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
+        \$classAliasLoader->register($prependAutoloader);
 
-		self::\$loader = \$classAliasLoader;
+        self::\$loader = \$classAliasLoader;
 
-		return \$classAliasLoader;
+        return \$classAliasLoader;
 
-	}
+    }
 }
 
 EOF;
