@@ -79,7 +79,7 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOffButClassIsFound() 
+    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOffButClassIsFound()
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturn(true);
         $this->subject->setCaseSensitiveClassLoading(false);
@@ -89,7 +89,7 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function composerLoadClassIsCalledTwiceWhenCaseSensitiveClassLoadingIsOffAndClassIsNotFound() 
+    public function composerLoadClassIsCalledTwiceWhenCaseSensitiveClassLoadingIsOffAndClassIsNotFound()
     {
         $this->composerClassLoaderMock->expects($this->exactly(2))->method('loadClass');
         $this->subject->setCaseSensitiveClassLoading(false);
