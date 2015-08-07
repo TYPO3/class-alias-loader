@@ -25,8 +25,8 @@ class ClassAliasMap
      * You can use this method in your code if you compare class names as strings and want to provide compatibility for that as well.
      * The impact is pretty low and boils down to a method call. In case no aliases are present in the composer installation,
      * the class name given is returned as is, because the vendor/autoload.php will not be rewritten and thus the static member of this
-     * class will not be set. 
-     * 
+     * class will not be set.
+     *
      * @param string $classNameOrAlias
      * @return string
      */
