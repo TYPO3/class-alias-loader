@@ -38,6 +38,31 @@ class ClassAliasMap
     }
 
     /**
+     * Whether or not alias maps are already registered
+     *
+     * @return bool
+     */
+    public static function hasAliasMaps()
+    {
+        return is_object(static::$classAliasLoader);
+    }
+
+    /**
+     * Adds an alias map if the alias loader is registered, throws an exception otherwise.
+     *
+     * @param array $aliasMap
+     * @throws \RuntimeException
+     */
+    public static function addAliasMap(array $aliasMap)
+    {
+        if (!static::$classAliasLoader) {
+            throw new \RuntimeException('Cannot set an alias map as the alias loader is not registered!', 1439228111);
+        }
+
+        static::$classAliasLoader->addAliasMap($aliasMap);
+    }
+
+    /**
      * @param ClassAliasLoader $classAliasLoader
      */
     public static function setClassAliasLoader(ClassAliasLoader $classAliasLoader)
