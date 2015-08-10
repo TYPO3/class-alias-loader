@@ -124,7 +124,7 @@ class ClassAliasLoaderInit$suffix {
         \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
         \$classAliasLoader->register($prependAutoloader);
 
-        return \$classAliasLoader;
+        return \$composerClassLoader;
     }
 }
 
