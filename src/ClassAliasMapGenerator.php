@@ -33,7 +33,7 @@ class ClassAliasMapGenerator
 
         $filesystem = new Filesystem();
         $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
-        $basePath = $filesystem->normalizePath(realpath(getcwd()));
+        $basePath = self::extractBasePath($config);
         $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
         $targetDir = $vendorPath . '/composer';
         $filesystem->ensureDirectoryExists($targetDir);
@@ -226,6 +226,20 @@ EOF;
             return strtolower($match[0]);
         }, $classMapContents);
         file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
+    }
+
+
+    /**
+     * Extracts the bas path out of composer config
+     *
+     * @param \Composer\Config $config
+     * @return mixed
+     */
+    protected static function extractBasePath(\Composer\Config $config) {
+        $reflectionClass = new \ReflectionClass($config);
+        $reflectionProperty = $reflectionClass->getProperty('baseDir');
+        $reflectionProperty->setAccessible(true);
+        return $reflectionProperty->getValue($config);
     }
 
 }
