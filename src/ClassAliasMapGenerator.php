@@ -75,15 +75,17 @@ class ClassAliasMapGenerator
         }
 
         $mainPackageAliasLoaderConfig = self::getAliasLoaderConfigFromPackage($mainPackage);
+        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig['always-add-alias-loader'];
         $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig['autoload-case-sensitivity'];
 
-        if (!$classAliasMappingFound && $caseSensitiveClassLoading) {
+        if (!$alwaysAddAliasLoader && !$classAliasMappingFound && $caseSensitiveClassLoading) {
             // No mapping found in any package and no insensitive class loading active. We return early and skip rewriting
+            // Unless user configured alias loader to be always added
             return false;
         }
 
         $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
-        $event->getIO()->write('<info>Generating class alias map file</info>');
+        $event->getIO()->write('<info>Generating class ' . ($classAliasMappingFound ? ' ' : 'empty ') . 'alias map file</info>');
         self::generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
         $suffix = null;
@@ -157,10 +159,14 @@ EOF;
         $extraConfig = $package->getExtra();
         $aliasLoaderConfig = array(
                 'class-alias-maps' => array(),
+                'always-add-alias-loader' => false,
                 'autoload-case-sensitivity' => true
         );
         if (isset($extraConfig['helhum/class-alias-loader']['class-alias-maps'])) {
-            $aliasLoaderConfig['class-alias-maps'] = $extraConfig['helhum/class-alias-loader']['class-alias-maps'];
+            $aliasLoaderConfig['class-alias-maps'] = (array)$extraConfig['helhum/class-alias-loader']['class-alias-maps'];
+        }
+        if (isset($extraConfig['helhum/class-alias-loader']['always-add-alias-loader'])) {
+            $aliasLoaderConfig['always-add-alias-loader'] = (bool)$extraConfig['helhum/class-alias-loader']['always-add-alias-loader'];
         }
         if (isset($extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'])) {
             $aliasLoaderConfig['autoload-case-sensitivity'] = (bool)$extraConfig['helhum/class-alias-loader']['autoload-case-sensitivity'];

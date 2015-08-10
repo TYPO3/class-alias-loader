@@ -57,15 +57,30 @@ You can activate this feature like this:
 
 The default value of this option is `true`.
 
-If no alias mapping is found and case sensitivity is set to `true` then this package does nothing. It means no additional class loading information is dumped
+If no alias mapping is found and case sensitivity is set to `true` then by default this package does nothing. It means no additional class loading information is dumped
 and the `vendor/autoload.php` is not changed. This enables library vendors to deliver compatibility packages which provide such aliases
 for backwards compatibility, but keep the library clean (and faster) for new users.
 
+In case you want your application to add alias maps during runtime, it may be useful however if the alias loader is always initialized.
+Therefore it is possible to set the following option in your *root* `composer.json`:
+
+```
+    "extra": {
+        "helhum/class-alias-loader": {
+            "always-add-alias-loader": true
+        }
+    },
+```
+
+
 ## Using the API
 
-The public API is pretty simple and consists of only one class with only one static method `Helhum\ClassAliasLoader\ClassAliasMap::getClassNameForAlias`
-You can use this API if you have places in your application that deals with class names in strings and want to provide backwards compatibility there.
+The public API is pretty simple and consists of only one class with only three static methods, `Helhum\ClassAliasLoader\ClassAliasMap::getClassNameForAlias`
+being the most important one.
+You can use this class method if you have places in your application that deals with class names in strings and want to provide backwards compatibility there.
 The API returns the original (new) class name if there is one, or the class name given if no alias is found.
+
+The remaining methods, deal with adding alias maps during runtime, which generally is not recommended to do.
 
 ## Feedback appreciated
 
