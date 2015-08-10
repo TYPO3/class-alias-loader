@@ -117,7 +117,7 @@ class ClassAliasLoaderInit$suffix {
         \$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
 
         self::\$loader = \$classAliasLoader;
-        Helhum\ClassAliasLoader\ClassAliasMap::\$classAliasLoader = \$classAliasLoader;
+        Helhum\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
 
         \$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
         \$classAliasLoader->setAliasMap(\$classAliasMap);

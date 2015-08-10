@@ -19,7 +19,7 @@ class ClassAliasMap
     /**
      * @var ClassAliasLoader
      */
-    public static $classAliasLoader;
+    protected static $classAliasLoader;
 
     /**
      * You can use this method in your code if you compare class names as strings and want to provide compatibility for that as well.
@@ -35,6 +35,17 @@ class ClassAliasMap
             return $classNameOrAlias;
         }
         return static::$classAliasLoader->getClassNameForAlias($classNameOrAlias);
+    }
+
+    /**
+     * @param ClassAliasLoader $classAliasLoader
+     */
+    public static function setClassAliasLoader(ClassAliasLoader $classAliasLoader)
+    {
+        if (static::$classAliasLoader) {
+            throw new \RuntimeException('Cannot set the alias loader, as it is already registered!', 1439228112);
+        }
+        static::$classAliasLoader = $classAliasLoader;
     }
 
 }
