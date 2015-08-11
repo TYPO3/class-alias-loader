@@ -85,7 +85,7 @@ class ClassAliasMapGenerator
         }
 
         $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
-        $event->getIO()->write('<info>Generating class ' . ($classAliasMappingFound ? ' ' : 'empty ') . 'alias map file</info>');
+        $event->getIO()->write('<info>Generating ' . ($classAliasMappingFound ? ' ' : 'empty ') . 'class alias map file</info>');
         self::generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
         $suffix = null;
