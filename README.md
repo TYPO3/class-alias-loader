@@ -41,7 +41,7 @@ return array(
 
 In your *root* `composer.json` file, you can decide whether to allow classes to be found that are requested with wrong casing.
 Since PHP is case insensitive for class names, but PSR class loading standards bound file names to class names, class names de facto
-become case sensitive. For legacy packages ist may be useful however to allow class names to be loaded even if wrong casing is provided.
+become case sensitive. For legacy packages it may be useful however to allow class names to be loaded even if wrong casing is provided.
 For this to work properly, you need to use the composer [optimize class loading information feature](https://getcomposer.org/doc/03-cli.md#global-options).
 
 
