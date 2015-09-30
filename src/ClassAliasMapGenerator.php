@@ -111,22 +111,21 @@ class ClassAliasLoaderInit$suffix {
 
     private static \$loader;
 
-    public static function getAliasLoader(\$composerClassLoader) {
+    public static function initializeClassAliasLoader(\$composerClassLoader) {
         if (null !== self::\$loader) {
             return self::\$loader;
         }
-
-        \$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
-
-        self::\$loader = \$classAliasLoader;
-        Helhum\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
+        self::\$loader = \$composerClassLoader;
 
         \$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
+        \$classAliasLoader = new Helhum\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
         \$classAliasLoader->setAliasMap(\$classAliasMap);
         \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
         \$classAliasLoader->register($prependAutoloader);
 
-        return \$composerClassLoader;
+        Helhum\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
+
+        return self::\$loader;
     }
 }
 
@@ -192,7 +191,7 @@ $originalAutoloadFileContent
 
 require_once __DIR__ . '/composer/autoload_alias_loader_real.php';
 
-return ClassAliasLoaderInit$suffix::getAliasLoader($composerClassLoaderInit);
+return ClassAliasLoaderInit$suffix::initializeClassAliasLoader($composerClassLoaderInit);
 
 EOF;
 
