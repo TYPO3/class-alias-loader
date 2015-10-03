@@ -26,7 +26,7 @@ class ClassAliasMapGenerator
      * @return bool
      * @throws \Exception
      */
-    static public function generateAliasMap(\Composer\Script\Event $event)
+    public static function generateAliasMap(\Composer\Script\Event $event)
     {
         $composer = $event->getComposer();
         $config = $composer->getConfig();
@@ -153,7 +153,7 @@ EOF;
      * @return array
      * @TODO: refactor into own config object
      */
-    static protected function getAliasLoaderConfigFromPackage(PackageInterface $package)
+    protected static function getAliasLoaderConfigFromPackage(PackageInterface $package)
     {
         $extraConfig = $package->getExtra();
         $aliasLoaderConfig = array(
@@ -178,7 +178,7 @@ EOF;
      * @param $autoloadFile
      * @param string $suffix
      */
-    static protected function modifyMainAutoloadFile($autoloadFile, $suffix)
+    protected static function modifyMainAutoloadFile($autoloadFile, $suffix)
     {
         $originalAutoloadFileContent = file_get_contents($autoloadFile);
         preg_match('/return ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
@@ -204,7 +204,7 @@ EOF;
      * @param array $classNameToAliasMapping
      * @param string $targetDir
      */
-    static protected function generateAliasMapFile(array $aliasToClassNameMapping, array $classNameToAliasMapping, $targetDir)
+    protected static function generateAliasMapFile(array $aliasToClassNameMapping, array $classNameToAliasMapping, $targetDir)
     {
         $exportArray = array(
             'aliasToClassNameMapping' => $aliasToClassNameMapping,
@@ -224,7 +224,7 @@ EOF;
      *
      * @param string $targetDir
      */
-    static protected function rewriteClassMapWithLowerCaseClassNames($targetDir)
+    protected static function rewriteClassMapWithLowerCaseClassNames($targetDir)
     {
         $classMapContents = file_get_contents($targetDir . '/autoload_classmap.php');
         $classMapContents = preg_replace_callback('/    \'[^\']*\' => /', function ($match) {
