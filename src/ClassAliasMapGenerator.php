@@ -207,8 +207,8 @@ EOF;
     static protected function generateAliasMapFile(array $aliasToClassNameMapping, array $classNameToAliasMapping, $targetDir)
     {
         $exportArray = array(
-                'aliasToClassNameMapping' => $aliasToClassNameMapping,
-                'classNameToAliasMapping' => $classNameToAliasMapping
+            'aliasToClassNameMapping' => $aliasToClassNameMapping,
+            'classNameToAliasMapping' => $classNameToAliasMapping
         );
 
         $fileContent = '<?php' . chr(10) . 'return ';
