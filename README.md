@@ -1,4 +1,4 @@
-Class Alias Loader [![Build Status](https://travis-ci.org/helhum/class-alias-loader.svg?branch=master)](https://travis-ci.org/helhum/class-alias-loader)
+Class Alias Loader [![Build Status](https://travis-ci.org/TYPO3/class-alias-loader.svg?branch=master)](https://travis-ci.org/TYPO3/class-alias-loader)
 ==================
 
 ## Introduction
@@ -21,7 +21,7 @@ You can define multiple class alias map files in the extra section of the `ompos
 
 ```
     "extra": {
-        "helhum/class-alias-loader": {
+        "typo3/class-alias-loader": {
             "class-alias-maps": [
                 "Migrations/Code/ClassAliasMap.php"
             ]
@@ -49,7 +49,7 @@ You can activate this feature like this:
 
 ```
     "extra": {
-        "helhum/class-alias-loader": {
+        "typo3/class-alias-loader": {
             "autoload-case-sensitivity": false
         }
     },
@@ -66,7 +66,7 @@ Therefore it is possible to set the following option in your *root* `composer.js
 
 ```
     "extra": {
-        "helhum/class-alias-loader": {
+        "typo3/class-alias-loader": {
             "always-add-alias-loader": true
         }
     },
@@ -75,7 +75,7 @@ Therefore it is possible to set the following option in your *root* `composer.js
 
 ## Using the API
 
-The public API is pretty simple and consists of only one class with only three static methods, `Helhum\ClassAliasLoader\ClassAliasMap::getClassNameForAlias`
+The public API is pretty simple and consists of only one class with only three static methods, `TYPO3\ClassAliasLoader\ClassAliasMap::getClassNameForAlias`
 being the most important one.
 You can use this class method if you have places in your application that deals with class names in strings and want to provide backwards compatibility there.
 The API returns the original (new) class name if there is one, or the class name given if no alias is found.
@@ -84,10 +84,10 @@ The remaining methods, deal with adding alias maps during runtime, which general
 
 ## Feedback appreciated
 
-I'm happy for feedback, be it [feature requests](https://github.com/helhum/class-alias-loader/issues) or [bug reports](https://github.com/helhum/class-alias-loader/issues).
+I'm happy for feedback, be it [feature requests](https://github.com/TYPO3/class-alias-loader/issues) or [bug reports](https://github.com/TYPO3/class-alias-loader/issues).
 
 ## Contribute
 
-If you feel like contributing, please do a regular [pull request](https://github.com/helhum/class-alias-loader/pulls).
+If you feel like contributing, please do a regular [pull request](https://github.com/TYPO3/class-alias-loader/pulls).
 The package is pretty small. The only thing to respect is to follow [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md) coding standard
 and to add some tests for functionality you add or change.

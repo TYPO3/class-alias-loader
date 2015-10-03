@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\ClassAliasLoader\Tests\Unit;
+namespace TYPO3\ClassAliasLoader\Tests\Unit;
 
 /*
  * This file is part of the class alias loader package.
@@ -11,7 +11,7 @@ namespace Helhum\ClassAliasLoader\Tests\Unit;
  */
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
-use Helhum\ClassAliasLoader\ClassAliasLoader;
+use TYPO3\ClassAliasLoader\ClassAliasLoader;
 
 /**
  * Test case for ClassAliasLoader
