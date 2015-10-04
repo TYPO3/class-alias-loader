@@ -28,6 +28,9 @@
         "mikey179/vfsStream": "1.4.*@dev",
         "phpunit/phpunit": "~4.7.0"
     },
+    "replace": {
+        "helhum/class-alias-loader": "*"
+    },
     "extra": {
         "class": "TYPO3\\ClassAliasLoader\\Plugin",
         "branch-alias": {
