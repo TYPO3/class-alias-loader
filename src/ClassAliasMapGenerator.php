@@ -48,6 +48,7 @@ class ClassAliasMapGenerator
         $classAliasMappingFound = false;
 
         foreach ($packageMap as $item) {
+            /** @var PackageInterface $package */
             list($package, $installPath) = $item;
             $aliasLoaderConfig = self::getAliasLoaderConfigFromPackage($package, $event);
             if (!empty($aliasLoaderConfig['class-alias-maps'])) {
@@ -56,10 +57,12 @@ class ClassAliasMapGenerator
                 }
                 foreach ($aliasLoaderConfig['class-alias-maps'] as $mapFile) {
                     $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
-                    if (is_file($mapFilePath)) {
+                    if (!is_file($mapFilePath)) {
+                        $event->getIo()->writeError(sprintf('The class alias map file "%s" configured in package "%s" was not found!', $mapFile, $package->getName()));
+                    } else {
                         $packageAliasMap = require $mapFilePath;
                         if (!is_array($packageAliasMap)) {
-                            throw new \Exception('"class alias maps" must return an array', 1422625075);
+                            throw new \Exception('"Class alias maps" must return an array', 1422625075);
                         }
                         if (!empty($packageAliasMap)) {
                             $classAliasMappingFound = true;
