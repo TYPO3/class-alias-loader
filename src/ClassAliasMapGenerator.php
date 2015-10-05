@@ -191,31 +191,23 @@ EOF;
         if (!isset($extraConfig['typo3/class-alias-loader'])) {
             if (isset($extraConfig['helhum/class-alias-loader'])) {
                 $extraConfig['typo3/class-alias-loader'] = $extraConfig['helhum/class-alias-loader'];
-                $event->getIO()->write(
-                    sprintf(
-                        'The package "%s" uses "helhum/class-alias-loader" section to define class alias maps, which is deprecated. Please use "typo3/class-alias-loader" instead!',
-                        $package->getName()
-                    )
-                );
-            }
-            $extraConfig['typo3/class-alias-loader'] = array();
-            if (isset($extraConfig['class-alias-maps'])) {
-                $extraConfig['typo3/class-alias-loader']['class-alias-maps'] = $extraConfig['class-alias-maps'];
-                $event->getIO()->write(
-                    sprintf(
-                        'The package "%s" uses "class-alias-maps" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!',
-                        $package->getName()
-                    )
-                );
-            }
-            if (isset($extraConfig['autoload-case-sensitivity'])) {
-                $extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'] = $extraConfig['autoload-case-sensitivity'];
-                $event->getIO()->write(
-                    sprintf(
-                        'The package "%s" uses "autoload-case-sensitivity" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!',
-                        $package->getName()
-                    )
-                );
+                $event->getIO()
+                      ->write(sprintf('The package "%s" uses "helhum/class-alias-loader" section to define class alias maps, which is deprecated. Please use "typo3/class-alias-loader" instead!',
+                                      $package->getName()));
+            } else {
+                $extraConfig['typo3/class-alias-loader'] = array();
+                if (isset($extraConfig['class-alias-maps'])) {
+                    $extraConfig['typo3/class-alias-loader']['class-alias-maps'] = $extraConfig['class-alias-maps'];
+                    $event->getIO()
+                          ->write(sprintf('The package "%s" uses "class-alias-maps" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!',
+                                          $package->getName()));
+                }
+                if (isset($extraConfig['autoload-case-sensitivity'])) {
+                    $extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'] = $extraConfig['autoload-case-sensitivity'];
+                    $event->getIO()
+                          ->write(sprintf('The package "%s" uses "autoload-case-sensitivity" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!',
+                                          $package->getName()));
+                }
             }
         }
         return $extraConfig;
