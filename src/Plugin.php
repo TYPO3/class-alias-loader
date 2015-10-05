@@ -75,7 +75,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostAutoloadDump(\Composer\Script\Event $event)
     {
-        return ClassAliasMapGenerator::generateAliasMap($event);
+        $flags = $event->getFlags();
+        $config = $event->getComposer()->getConfig();
+        $optimizeAutoloadFiles = !empty($flags['optimize']) || $config->get('optimize-autoloader') || $config->get('classmap-authoritative');
+
+        $aliasMapGenerator = new ClassAliasMapGenerator(
+            $event->getComposer(),
+            $event->getIO(),
+            $optimizeAutoloadFiles
+        );
+
+        return $aliasMapGenerator->generateAliasMap();
     }
 
 }
