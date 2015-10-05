@@ -79,19 +79,19 @@ class ClassAliasMapGenerator
         foreach ($packageMap as $item) {
             /** @var PackageInterface $package */
             list($package, $installPath) = $item;
-            $aliasLoaderConfig = $this->getAliasLoaderConfigFromPackage($package);
-            if (!empty($aliasLoaderConfig['class-alias-maps'])) {
-                if (!is_array($aliasLoaderConfig['class-alias-maps'])) {
-                    throw new \Exception('"class-alias-maps" must be an array');
+            $aliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($package, $this->IO);
+            if ($aliasLoaderConfig->get('class-alias-maps') !== null) {
+                if (!is_array($aliasLoaderConfig->get('class-alias-maps'))) {
+                    throw new \Exception('Configuration option "class-alias-maps" must be an array');
                 }
-                foreach ($aliasLoaderConfig['class-alias-maps'] as $mapFile) {
+                foreach ($aliasLoaderConfig->get('class-alias-maps') as $mapFile) {
                     $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
                     if (!is_file($mapFilePath)) {
                         $this->IO->writeError(sprintf('The class alias map file "%s" configured in package "%s" was not found!', $mapFile, $package->getName()));
                     } else {
                         $packageAliasMap = require $mapFilePath;
                         if (!is_array($packageAliasMap)) {
-                            throw new \Exception('"Class alias maps" must return an array', 1422625075);
+                            throw new \Exception('Class alias map files must return an array', 1422625075);
                         }
                         if (!empty($packageAliasMap)) {
                             $classAliasMappingFound = true;
@@ -106,9 +106,9 @@ class ClassAliasMapGenerator
             }
         }
 
-        $mainPackageAliasLoaderConfig = $this->getAliasLoaderConfigFromPackage($mainPackage);
-        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig['always-add-alias-loader'];
-        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig['autoload-case-sensitivity'];
+        $mainPackageAliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($mainPackage);
+        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig->get('always-add-alias-loader');
+        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig->get('autoload-case-sensitivity');
 
         if (!$alwaysAddAliasLoader && !$classAliasMappingFound && $caseSensitiveClassLoading) {
             // No mapping found in any package and no insensitive class loading active. We return early and skip rewriting
@@ -176,73 +176,6 @@ EOF;
         $this->modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
         return true;
-    }
-
-    /**
-     * @param PackageInterface $package
-     * @return array
-     * @TODO: refactor into own config object
-     */
-    protected function getAliasLoaderConfigFromPackage(PackageInterface $package)
-    {
-        $extraConfig = $this->handleDeprecatedConfigurationInPackage($package);
-        $aliasLoaderConfig = array(
-                'class-alias-maps' => array(),
-                'always-add-alias-loader' => false,
-                'autoload-case-sensitivity' => true
-        );
-        if (isset($extraConfig['typo3/class-alias-loader']['class-alias-maps'])) {
-            $aliasLoaderConfig['class-alias-maps'] = (array)$extraConfig['typo3/class-alias-loader']['class-alias-maps'];
-        }
-        if (isset($extraConfig['typo3/class-alias-loader']['always-add-alias-loader'])) {
-            $aliasLoaderConfig['always-add-alias-loader'] = (bool)$extraConfig['typo3/class-alias-loader']['always-add-alias-loader'];
-        }
-        if (isset($extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'])) {
-            $aliasLoaderConfig['autoload-case-sensitivity'] = (bool)$extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'];
-        }
-
-        return $aliasLoaderConfig;
-    }
-
-    /**
-     * Ensures backwards compatibility for packages which used helhum/class-alias-loader
-     *
-     * @param PackageInterface $package
-     * @return array
-     */
-    protected function handleDeprecatedConfigurationInPackage(PackageInterface $package)
-    {
-        $extraConfig = $package->getExtra();
-        $messages = array();
-        if (!isset($extraConfig['typo3/class-alias-loader'])) {
-            if (isset($extraConfig['helhum/class-alias-loader'])) {
-                $extraConfig['typo3/class-alias-loader'] = $extraConfig['helhum/class-alias-loader'];
-                $messages[] = sprintf(
-                    '<warning>The package "%s" uses "helhum/class-alias-loader" section to define class alias maps, which is deprecated. Please use "typo3/class-alias-loader" instead!</warning>',
-                    $package->getName()
-                );
-            } else {
-                $extraConfig['typo3/class-alias-loader'] = array();
-                if (isset($extraConfig['class-alias-maps'])) {
-                    $extraConfig['typo3/class-alias-loader']['class-alias-maps'] = $extraConfig['class-alias-maps'];
-                    $messages[] = sprintf(
-                        '<warning>The package "%s" uses "class-alias-maps" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!</warning>',
-                        $package->getName()
-                    );
-                }
-                if (isset($extraConfig['autoload-case-sensitivity'])) {
-                    $extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'] = $extraConfig['autoload-case-sensitivity'];
-                    $messages[] = sprintf(
-                        '<warning>The package "%s" uses "autoload-case-sensitivity" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!</warning>',
-                        $package->getName()
-                    );
-                }
-            }
-        }
-        if (!empty($messages)) {
-            $this->IO->writeError($messages);
-        }
-        return $extraConfig;
     }
 
     /**
