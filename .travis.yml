@@ -4,15 +4,16 @@ matrix:
   fast_finish: true
   include:
     - php: 5.3
-      env: UNIT_TESTS=yes
     - php: 5.5
-      env: UNIT_TESTS=yes
     - php: 5.6
-      env: UNIT_TESTS=yes
     - php: 7
-      env: UNIT_TESTS=yes
 
 sudo: false
+
+addons:
+  apt:
+    packages:
+      - parallel
 
 cache:
   directories:
@@ -28,8 +29,11 @@ before_script:
 
 script:
   - >
-    if [[ "$UNIT_TESTS" == "yes" ]]; then
-      echo;
-      echo "Running unit tests";
-      vendor/bin/phpunit --colors tests/Unit/
-    fi
+    echo;
+    echo "Running unit tests";
+    vendor/bin/phpunit --colors tests/Unit/
+
+  - >
+    echo;
+    echo "Running php lint";
+    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
