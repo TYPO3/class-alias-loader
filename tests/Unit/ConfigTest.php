@@ -60,6 +60,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->subject->get('always-add-alias-loader'));
         $this->assertTrue($this->subject->get('autoload-case-sensitivity'));
         $this->assertNull($this->subject->get('class-alias-maps'));
+        $this->assertEquals('normal', $this->subject->get('autoload-mode'));
     }
 
     /**

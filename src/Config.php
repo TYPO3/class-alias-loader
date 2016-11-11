@@ -19,15 +19,24 @@ use Composer\Package\PackageInterface;
  */
 class Config
 {
+    const OPTION_CLASS_ALIAS_MAPS = 'class-alias-maps';
+    const OPTION_ALWAYS_ADD_ALIAS_LOADER = 'always-add-alias-loader';
+    const OPTION_AUTOLOAD_IS_CASE_SENSITIVE = 'autoload-case-sensitivity';
+    const OPTION_AUTOLOAD_MODE = 'autoload-mode';
+
+    const AUTOLOAD_MODE_NORMAL = 'normal';
+    const AUTOLOAD_MODE_FORCE_ALIAS_LOADING = 'force-alias-loading';
+
     /**
      * Default values
      *
      * @var array
      */
     protected $config = array(
-        'class-alias-maps' => null,
-        'always-add-alias-loader' => false,
-        'autoload-case-sensitivity' => true
+        self::OPTION_CLASS_ALIAS_MAPS => null,
+        self::OPTION_ALWAYS_ADD_ALIAS_LOADER => false,
+        self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE => true,
+        self::OPTION_AUTOLOAD_MODE => self::AUTOLOAD_MODE_NORMAL,
     );
 
      /**
@@ -76,14 +85,14 @@ class Config
     protected function setAliasLoaderConfigFromPackage(PackageInterface $package)
     {
         $extraConfig = $this->handleDeprecatedConfigurationInPackage($package);
-        if (isset($extraConfig['typo3/class-alias-loader']['class-alias-maps'])) {
-            $this->config['class-alias-maps'] = (array)$extraConfig['typo3/class-alias-loader']['class-alias-maps'];
+        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_CLASS_ALIAS_MAPS])) {
+            $this->config[self::OPTION_CLASS_ALIAS_MAPS] = (array)$extraConfig['typo3/class-alias-loader'][self::OPTION_CLASS_ALIAS_MAPS];
         }
-        if (isset($extraConfig['typo3/class-alias-loader']['always-add-alias-loader'])) {
-            $this->config['always-add-alias-loader'] = (bool)$extraConfig['typo3/class-alias-loader']['always-add-alias-loader'];
+        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_ALWAYS_ADD_ALIAS_LOADER])) {
+            $this->config[self::OPTION_ALWAYS_ADD_ALIAS_LOADER] = (bool)$extraConfig['typo3/class-alias-loader'][self::OPTION_ALWAYS_ADD_ALIAS_LOADER];
         }
-        if (isset($extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'])) {
-            $this->config['autoload-case-sensitivity'] = (bool)$extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'];
+        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE])) {
+            $this->config[self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE] = (bool)$extraConfig['typo3/class-alias-loader'][self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE];
         }
     }
 
@@ -106,15 +115,15 @@ class Config
                 );
             } else {
                 $extraConfig['typo3/class-alias-loader'] = array();
-                if (isset($extraConfig['class-alias-maps'])) {
-                    $extraConfig['typo3/class-alias-loader']['class-alias-maps'] = $extraConfig['class-alias-maps'];
+                if (isset($extraConfig[self::OPTION_CLASS_ALIAS_MAPS])) {
+                    $extraConfig['typo3/class-alias-loader'][self::OPTION_CLASS_ALIAS_MAPS] = $extraConfig[self::OPTION_CLASS_ALIAS_MAPS];
                     $messages[] = sprintf(
                         '<warning>The package "%s" uses "class-alias-maps" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!</warning>',
                         $package->getName()
                     );
                 }
-                if (isset($extraConfig['autoload-case-sensitivity'])) {
-                    $extraConfig['typo3/class-alias-loader']['autoload-case-sensitivity'] = $extraConfig['autoload-case-sensitivity'];
+                if (isset($extraConfig[self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE])) {
+                    $extraConfig['typo3/class-alias-loader'][self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE] = $extraConfig[self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE];
                     $messages[] = sprintf(
                         '<warning>The package "%s" uses "autoload-case-sensitivity" section on top level, which is deprecated. Please move this config below the top level key "typo3/class-alias-loader" instead!</warning>',
                         $package->getName()

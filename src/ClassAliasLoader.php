@@ -109,6 +109,21 @@ class ClassAliasLoader
     }
 
     /**
+     * Alternative to using as an autoloader, which pre-loads all aliases.
+     * This does NOT perform any checks against the RealClassName, as classes are not auto-loaded with this function.
+     */
+    public function registerAllAliases()
+    {
+        foreach($this->aliasMap['classNameToAliasMapping'] as $originalClassName) {
+            foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
+                if (!$this->classOrInterfaceExists($aliasClassName)) {
+                    class_alias($originalClassName, $aliasClassName);
+                }
+            }
+        }
+    }
+
+    /**
      * Main class loading method registered with spl_autoload_register()
      *
      * @param string $className
