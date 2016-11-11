@@ -72,6 +72,18 @@ Therefore it is possible to set the following option in your *root* `composer.js
     },
 ```
 
+In cases where another autoloader conflicts with the alias autoloader, you may find it helpful to bypass the autoloader
+entirely, and choose to instead force the loading of all known aliases at boot. 
+
+```
+    "extra": {
+        "typo3/class-alias-loader": {
+            "autoloader-mode": "force-alias-loading"
+        }
+    },
+```
+This method of loading aliases may incur a significant performance hit if you have a large number of classes aliased.
+The class aliases are also established without loading the classes themselves.
 
 ## Using the API
 
