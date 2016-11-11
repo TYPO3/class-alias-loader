@@ -131,8 +131,8 @@ class ClassAliasLoader
      */
     public function registerAllAliases()
     {
-        foreach($this->aliasMap['classNameToAliasMapping'] as $originalClassName) {
-            foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
+        foreach($this->aliasMap['classNameToAliasMapping'] as $originalClassName => $maps) {
+            foreach ($maps as $aliasClassName) {
                 if (!$this->classOrInterfaceExists($aliasClassName)) {
                     class_alias($originalClassName, $aliasClassName);
                 }
