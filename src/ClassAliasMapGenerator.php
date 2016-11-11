@@ -136,7 +136,7 @@ class ClassAliasMapGenerator
 
         // Autoloader mode check
         $autoloadMode = $mainPackageAliasLoaderConfig->get(\TYPO3\ClassAliasLoader\Config::OPTION_AUTOLOAD_MODE);
-        $autoloadModeForceAliasLoad = \TYPO3\ClassAliasLoader\Config::AUTOLOAD_MODE_FORCE_ALIAS_LOADING;
+        $forceAliasLoading = ($autoloadMode == \TYPO3\ClassAliasLoader\Config::AUTOLOAD_MODE_FORCE_ALIAS_LOADING);
 
         $aliasLoaderInitClassContent = <<<EOF
 <?php
@@ -157,11 +157,8 @@ class ClassAliasLoaderInit$suffix {
         \$classAliasLoader = new TYPO3\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
         \$classAliasLoader->setAliasMap(\$classAliasMap);
         \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
-        if ($autoloadMode == $autoloadModeForceAliasLoad) {
-            \$classAliasLoader->registerAllAliases($prependAutoloader);
-        } else {
-            \$classAliasLoader->register($prependAutoloader);
-        }
+        \$classAliasLoader->setForceAliasLoading($forceAliasLoading);
+        \$classAliasLoader->register($prependAutoloader);
 
         TYPO3\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
 

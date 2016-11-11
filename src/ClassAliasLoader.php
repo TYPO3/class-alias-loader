@@ -37,6 +37,11 @@ class ClassAliasLoader
     protected $caseSensitiveClassLoading = true;
 
     /**
+     * @var bool
+     */
+    protected $forceAliasLoading = false;
+
+    /**
      * @param ComposerClassLoader $composerClassLoader
      */
     public function __construct(ComposerClassLoader $composerClassLoader)
@@ -60,6 +65,14 @@ class ClassAliasLoader
     public function setCaseSensitiveClassLoading($caseSensitiveClassLoading)
     {
         $this->caseSensitiveClassLoading = $caseSensitiveClassLoading;
+    }
+
+    /**
+     * @param boolean $forceAliasLoading
+     */
+    public function setForceAliasLoading($forceAliasLoading)
+    {
+        $this->forceAliasLoading = $forceAliasLoading;
     }
 
     /**
@@ -96,8 +109,12 @@ class ClassAliasLoader
      */
     public function register($prepend = false)
     {
-        $this->composerClassLoader->unregister();
-        spl_autoload_register(array($this, 'loadClassWithAlias'), true, $prepend);
+        if ($this->forceAliasLoading) {
+            $this->registerAllAliases();
+        } else {
+            $this->composerClassLoader->unregister();
+            spl_autoload_register(array($this, 'loadClassWithAlias'), true, $prepend);
+        }
     }
 
     /**
