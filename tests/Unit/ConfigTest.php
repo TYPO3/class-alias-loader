@@ -114,6 +114,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'typo3/class-alias-loader' => array(
                     'always-add-alias-loader' => true,
                     'autoload-case-sensitivity' => false,
+                    'autoload-mode' => 'test',
                 )
             )
         );
@@ -122,6 +123,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($subject->get('always-add-alias-loader'));
         $this->assertFalse($subject->get('autoload-case-sensitivity'));
+        $this->assertEquals('test', $subject->get('autoload-mode'));
     }
 
     /**
@@ -134,6 +136,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'helhum/class-alias-loader' => array(
                     'always-add-alias-loader' => true,
                     'autoload-case-sensitivity' => false,
+
                 )
             )
         );

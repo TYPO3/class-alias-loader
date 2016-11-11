@@ -28,7 +28,7 @@ class Config
     const AUTOLOAD_MODE_FORCE_ALIAS_LOADING = 'force-alias-loading';
 
     /**
-     * Default values
+     * Default config values
      *
      * @var array
      */
@@ -37,6 +37,18 @@ class Config
         self::OPTION_ALWAYS_ADD_ALIAS_LOADER => false,
         self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE => true,
         self::OPTION_AUTOLOAD_MODE => self::AUTOLOAD_MODE_NORMAL,
+    );
+
+    /**
+     * Config cast types
+     *
+     * @var array
+     */
+    protected $configCastType = array(
+        self::OPTION_CLASS_ALIAS_MAPS => 'array',
+        self::OPTION_ALWAYS_ADD_ALIAS_LOADER => 'bool',
+        self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE => 'bool',
+        self::OPTION_AUTOLOAD_MODE => 'string',
     );
 
      /**
@@ -85,14 +97,28 @@ class Config
     protected function setAliasLoaderConfigFromPackage(PackageInterface $package)
     {
         $extraConfig = $this->handleDeprecatedConfigurationInPackage($package);
-        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_CLASS_ALIAS_MAPS])) {
-            $this->config[self::OPTION_CLASS_ALIAS_MAPS] = (array)$extraConfig['typo3/class-alias-loader'][self::OPTION_CLASS_ALIAS_MAPS];
-        }
-        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_ALWAYS_ADD_ALIAS_LOADER])) {
-            $this->config[self::OPTION_ALWAYS_ADD_ALIAS_LOADER] = (bool)$extraConfig['typo3/class-alias-loader'][self::OPTION_ALWAYS_ADD_ALIAS_LOADER];
-        }
-        if (isset($extraConfig['typo3/class-alias-loader'][self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE])) {
-            $this->config[self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE] = (bool)$extraConfig['typo3/class-alias-loader'][self::OPTION_AUTOLOAD_IS_CASE_SENSITIVE];
+
+        foreach ($this->configCastType as $key => $type) {
+
+            if (isset($extraConfig['typo3/class-alias-loader'][$key])) {
+                $value = $extraConfig['typo3/class-alias-loader'][$key];
+
+                // Cast correct type
+                switch ($type) {
+                    case 'bool':
+                        $value = (bool) $value;
+                        break;
+                    case 'array':
+                        $value = (array) $value;
+                        break;
+                    case 'string':
+                        $value = (string) $value;
+                        break;
+                }
+
+                // Save value
+                $this->config[$key] = $value;
+            }
         }
     }
 
