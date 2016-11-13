@@ -30,18 +30,18 @@ class Config
         'autoload-case-sensitivity' => true
     );
 
-     /**
-     * @var IOInterface
-     */
-    protected $IO;
+    /**
+    * @var IOInterface
+    */
+    protected $io;
 
     /**
      * @param PackageInterface $package
-     * @param IOInterface $IO
+     * @param IOInterface $io
      */
-    public function __construct(PackageInterface $package, IOInterface $IO = null)
+    public function __construct(PackageInterface $package, IOInterface $io = null)
     {
-        $this->IO = $IO ?: new NullIO();
+        $this->io = $io ?: new NullIO();
         $this->setAliasLoaderConfigFromPackage($package);
     }
 
@@ -68,7 +68,6 @@ class Config
         }
         return $value;
     }
-
 
     /**
      * @param PackageInterface $package
@@ -123,9 +122,8 @@ class Config
             }
         }
         if (!empty($messages)) {
-            $this->IO->writeError($messages);
+            $this->io->writeError($messages);
         }
         return $extraConfig;
     }
-
 }

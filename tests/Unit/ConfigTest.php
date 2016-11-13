@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\ClassAliasLoader\Tests\Unit;
+namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 /*
  * This file is part of the class alias loader package.
@@ -27,7 +27,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @var IOInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $IOMock;
+    protected $ioMock;
 
     /**
      * @var PackageInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -36,10 +36,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->IOMock = $this->getMock('Composer\\IO\\IOInterface');
+        $this->ioMock = $this->getMock('Composer\\IO\\IOInterface');
         $this->packageMock = $this->getMock('Composer\\Package\\PackageInterface');
 
-       $this->subject = new Config($this->packageMock, $this->IOMock);
+        $this->subject = new Config($this->packageMock, $this->ioMock);
     }
 
     /**
@@ -77,7 +77,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $subject = new Config($this->packageMock, $this->IOMock);
+        $subject = new Config($this->packageMock, $this->ioMock);
 
         $this->assertSame(array('path/map.php'), $subject->get('class-alias-maps'));
     }
@@ -96,9 +96,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        $this->IOMock->expects($this->once())->method('writeError');
+        $this->ioMock->expects($this->once())->method('writeError');
 
-        $subject = new Config($this->packageMock, $this->IOMock);
+        $subject = new Config($this->packageMock, $this->ioMock);
 
         $this->assertSame(array('path/map.php'), $subject->get('class-alias-maps'));
     }
@@ -117,7 +117,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $subject = new Config($this->packageMock, $this->IOMock);
+        $subject = new Config($this->packageMock, $this->ioMock);
 
         $this->assertTrue($subject->get('always-add-alias-loader'));
         $this->assertFalse($subject->get('autoload-case-sensitivity'));
@@ -137,7 +137,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $subject = new Config($this->packageMock, $this->IOMock);
+        $subject = new Config($this->packageMock, $this->ioMock);
 
         $this->assertTrue($subject->get('always-add-alias-loader'));
         $this->assertFalse($subject->get('autoload-case-sensitivity'));
@@ -154,9 +154,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $subject = new Config($this->packageMock, $this->IOMock);
+        $subject = new Config($this->packageMock, $this->ioMock);
 
         $this->assertFalse($subject->get('autoload-case-sensitivity'));
     }
-
 }

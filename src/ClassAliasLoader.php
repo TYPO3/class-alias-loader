@@ -55,7 +55,7 @@ class ClassAliasLoader
     }
 
     /**
-     * @param boolean $caseSensitiveClassLoading
+     * @param bool $caseSensitiveClassLoading
      */
     public function setCaseSensitiveClassLoading($caseSensitiveClassLoading)
     {
@@ -126,7 +126,8 @@ class ClassAliasLoader
      * @param string $className
      * @return bool|null
      */
-    public function loadClass($className) {
+    public function loadClass($className)
+    {
         $classFound = $this->composerClassLoader->loadClass($className);
         if (!$classFound && !$this->caseSensitiveClassLoading) {
             $classFound = $this->composerClassLoader->loadClass(strtolower($className));
@@ -153,7 +154,7 @@ class ClassAliasLoader
             return $this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName];
         }
         // No alias registered for this class name, return and remember that info
-        return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = NULL;
+        return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = null;
     }
 
     /**
@@ -203,5 +204,4 @@ class ClassAliasLoader
 
         return call_user_func_array(array($this->composerClassLoader, $method), $arguments);
     }
-
 }

@@ -30,7 +30,8 @@ class ClassAliasMap
      * @param string $classNameOrAlias
      * @return string
      */
-    public static function getClassNameForAlias($classNameOrAlias) {
+    public static function getClassNameForAlias($classNameOrAlias)
+    {
         if (!static::$classAliasLoader) {
             return $classNameOrAlias;
         }
@@ -72,5 +73,4 @@ class ClassAliasMap
         }
         static::$classAliasLoader = $classAliasLoader;
     }
-
 }

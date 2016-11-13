@@ -33,7 +33,7 @@ class ClassAliasMapGenerator
     /**
      * @var IOInterface
      */
-    protected $IO;
+    protected $io;
 
     /**
      * @var bool
@@ -42,13 +42,13 @@ class ClassAliasMapGenerator
 
     /**
      * @param Composer $composer
-     * @param IOInterface $IO
+     * @param IOInterface $io
      * @param bool $optimizeAutoloadFiles
      */
-    public function __construct(Composer $composer, IOInterface $IO = null, $optimizeAutoloadFiles = false)
+    public function __construct(Composer $composer, IOInterface $io = null, $optimizeAutoloadFiles = false)
     {
         $this->composer = $composer;
-        $this->IO = $IO ?: new NullIO();
+        $this->io = $io ?: new NullIO();
         $this->optimizeAutoloadFiles = $optimizeAutoloadFiles;
     }
 
@@ -79,7 +79,7 @@ class ClassAliasMapGenerator
         foreach ($packageMap as $item) {
             /** @var PackageInterface $package */
             list($package, $installPath) = $item;
-            $aliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($package, $this->IO);
+            $aliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($package, $this->io);
             if ($aliasLoaderConfig->get('class-alias-maps') !== null) {
                 if (!is_array($aliasLoaderConfig->get('class-alias-maps'))) {
                     throw new \Exception('Configuration option "class-alias-maps" must be an array');
@@ -87,7 +87,7 @@ class ClassAliasMapGenerator
                 foreach ($aliasLoaderConfig->get('class-alias-maps') as $mapFile) {
                     $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
                     if (!is_file($mapFilePath)) {
-                        $this->IO->writeError(sprintf('The class alias map file "%s" configured in package "%s" was not found!', $mapFile, $package->getName()));
+                        $this->io->writeError(sprintf('The class alias map file "%s" configured in package "%s" was not found!', $mapFile, $package->getName()));
                     } else {
                         $packageAliasMap = require $mapFilePath;
                         if (!is_array($packageAliasMap)) {
@@ -117,7 +117,7 @@ class ClassAliasMapGenerator
         }
 
         $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
-        $this->IO->write('<info>Generating ' . ($classAliasMappingFound ? '' : 'empty ') . 'class alias map file</info>');
+        $this->io->write('<info>Generating ' . ($classAliasMappingFound ? '' : 'empty ') . 'class alias map file</info>');
         $this->generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
         $suffix = null;
@@ -165,14 +165,14 @@ EOF;
         file_put_contents($targetDir . '/autoload_alias_loader_real.php', $aliasLoaderInitClassContent);
 
         if (!$caseSensitiveClassLoading) {
-            $this->IO->write('<info>Re-writing class map to support case insensitive class loading</info>');
+            $this->io->write('<info>Re-writing class map to support case insensitive class loading</info>');
             if (!$this->optimizeAutoloadFiles) {
-                $this->IO->write('<warning>Case insensitive class loading only works reliably if you use the optimize class loading feature of composer</warning>');
+                $this->io->write('<warning>Case insensitive class loading only works reliably if you use the optimize class loading feature of composer</warning>');
             }
             $this->rewriteClassMapWithLowerCaseClassNames($targetDir);
         }
 
-        $this->IO->write('<info>Inserting class alias loader into main autoload.php file</info>');
+        $this->io->write('<info>Inserting class alias loader into main autoload.php file</info>');
         $this->modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
         return true;
@@ -200,7 +200,6 @@ return ClassAliasLoaderInit$suffix::initializeClassAliasLoader($composerClassLoa
 EOF;
 
         file_put_contents($autoloadFile, $autoloadFileContent);
-
     }
 
     /**
@@ -237,18 +236,17 @@ EOF;
         file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
     }
 
-
     /**
-     * Extracts the bas path out of composer config
+     * Extracts the base path out of composer config
      *
      * @param \Composer\Config $config
      * @return mixed
      */
-    protected function extractBasePath(\Composer\Config $config) {
+    protected function extractBasePath(\Composer\Config $config)
+    {
         $reflectionClass = new \ReflectionClass($config);
         $reflectionProperty = $reflectionClass->getProperty('baseDir');
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty->getValue($config);
     }
-
 }

@@ -17,15 +17,15 @@
         "psr-4": { "TYPO3\\ClassAliasLoader\\": "src/"}
     },
     "autoload-dev": {
-        "psr-4": { "TYPO3\\ClassAliasLoader\\Tests\\": "tests/"}
+        "psr-4": { "TYPO3\\ClassAliasLoader\\Test\\": "tests/"}
     },
     "require": {
         "php": ">=5.3.7",
         "composer-plugin-api": "^1.0"
     },
     "require-dev": {
-        "composer/composer": "dev-master",
-        "mikey179/vfsstream": "1.4.*@dev",
+        "composer/composer": "^1.1@dev",
+        "mikey179/vfsstream": "~1.4.0@dev",
         "phpunit/phpunit": "^4.8"
     },
     "replace": {
@@ -34,7 +34,7 @@
     "extra": {
         "class": "TYPO3\\ClassAliasLoader\\Plugin",
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.1.x-dev"
         }
     }
 }

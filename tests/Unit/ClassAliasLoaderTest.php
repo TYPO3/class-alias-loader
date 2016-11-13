@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\ClassAliasLoader\Tests\Unit;
+namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 /*
  * This file is part of the class alias loader package.
@@ -366,7 +366,6 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
         eval('class ' . $testClassName . ' {}');
         class_alias($testClassName, $testAlias1);
 
-
         $this->subject->loadClassWithAlias($testClassName);
 
         $this->assertTrue(class_exists($testAlias2, false), 'Second alias is not loaded');
@@ -403,5 +402,4 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
         $this->assertNull($this->subject->loadClassWithAlias($testClassName));
     }
-
 }

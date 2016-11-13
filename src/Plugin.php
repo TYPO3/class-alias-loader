@@ -11,9 +11,9 @@ namespace TYPO3\ClassAliasLoader;
  */
 
 use Composer\Composer;
+use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class Plugin
@@ -87,5 +87,4 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         return $aliasMapGenerator->generateAliasMap();
     }
-
 }
