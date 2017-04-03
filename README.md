@@ -17,7 +17,7 @@ is loaded and the alias is established, so that third party packages can use old
 
 ## Configuration in composer.json
 
-You can define multiple class alias map files in the extra section of the `omposer.json` like this:
+You can define multiple class alias map files in the extra section of the `composer.json` like this:
 
 ```
     "extra": {
