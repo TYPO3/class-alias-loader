@@ -41,6 +41,7 @@ return array(
     'Tx_Aboutmodules_Controller_ModulesController' => \TYPO3\CMS\Aboutmodules\Controller\ModulesController::class,
 );
 ```
+
 In your *root* `composer.json` file, you can decide whether to allow classes to be found that are requested with wrong casing.
 Since PHP is case insensitive for class names, but PSR class loading standards bound file names to class names, class names de facto
 become case sensitive. For legacy packages it may be useful however to allow class names to be loaded even if wrong casing is provided.
