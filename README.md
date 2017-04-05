@@ -47,10 +47,10 @@ The '::class' constant is not available before PHP 5.5. Under a PHP before 5.5 t
 ```
 <?php
 return array(
-    'Tx_About_Controller_AboutController' => '\TYPO3\CMS\About\Controller\AboutController',
-    'Tx_About_Domain_Model_Extension' => '\TYPO3\CMS\About\Domain\Model\Extension',
-    'Tx_About_Domain_Repository_ExtensionRepository' => '\TYPO3\CMS\About\Domain\Repository\ExtensionRepository',
-    'Tx_Aboutmodules_Controller_ModulesController' => '\TYPO3\CMS\Aboutmodules\Controller\ModulesController',
+    'Tx_About_Controller_AboutController' => 'TYPO3\\CMS\\About\\Controller\\AboutController',
+    'Tx_About_Domain_Model_Extension' => 'TYPO3\\CMS\\About\\Domain\\Model\\Extension',
+    'Tx_About_Domain_Repository_ExtensionRepository' => 'TYPO3\\CMS\\About\\Domain\\Repository\\ExtensionRepository',
+    'Tx_Aboutmodules_Controller_ModulesController' => 'TYPO3\\CMS\\Aboutmodules\\Controller\\ModulesController',
 );
 ```
 
