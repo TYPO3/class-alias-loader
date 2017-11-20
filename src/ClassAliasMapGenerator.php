@@ -117,7 +117,7 @@ class ClassAliasMapGenerator
         }
 
         $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
-        $this->IO->write('<info>Generating ' . ($classAliasMappingFound ? ' ' : 'empty ') . 'class alias map file</info>');
+        $this->IO->write('<info>Generating ' . ($classAliasMappingFound ? '' : 'empty ') . 'class alias map file</info>');
         $this->generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
 
         $suffix = null;
