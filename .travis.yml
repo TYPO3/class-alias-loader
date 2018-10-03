@@ -13,11 +13,6 @@ matrix:
 
 sudo: false
 
-addons:
-  apt:
-    packages:
-      - parallel
-
 cache:
   directories:
     - $HOME/.composer/cache
@@ -39,4 +34,4 @@ script:
   - >
     echo;
     echo "Running php lint";
-    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
+    find . -name \*.php ! -path "./vendor/*" | xargs -n1 php -d display_errors=stderr -l
