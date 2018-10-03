@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\ClassAliasLoader;
+namespace TYPO3\ClassAliasLoad er;
 
 /*
  * This file is part of the class alias loader package.
