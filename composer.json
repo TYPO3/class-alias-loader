@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "composer/composer": "dev-master",
-        "mikey179/vfsStream": "1.4.*@dev",
+        "mikey179/vfsstream": "1.4.*@dev",
         "phpunit/phpunit": "^4.8"
     },
     "replace": {
