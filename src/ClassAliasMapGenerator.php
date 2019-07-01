@@ -107,8 +107,8 @@ class ClassAliasMapGenerator
         }
 
         $mainPackageAliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($mainPackage);
-        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig->get('always-add-alias-loader');
-        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig->get('autoload-case-sensitivity');
+        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig->get(\TYPO3\ClassAliasLoader\Config::OPTION_ALWAYS_ADD_ALIAS_LOADER);
+        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig->get(\TYPO3\ClassAliasLoader\Config::OPTION_AUTOLOAD_IS_CASE_SENSITIVE);
 
         if (!$alwaysAddAliasLoader && !$classAliasMappingFound && $caseSensitiveClassLoading) {
             // No mapping found in any package and no insensitive class loading active. We return early and skip rewriting
@@ -134,6 +134,11 @@ class ClassAliasMapGenerator
 
         $prependAutoloader = $config->get('prepend-autoloader') === false ? 'false' : 'true';
 
+        // Autoloader mode check
+        $autoloadMode = $mainPackageAliasLoaderConfig->get(\TYPO3\ClassAliasLoader\Config::OPTION_AUTOLOAD_MODE);
+        $forceAliasLoading = ($autoloadMode == \TYPO3\ClassAliasLoader\Config::AUTOLOAD_MODE_FORCE_ALIAS_LOADING);
+        $forceAliasLoadingString = $forceAliasLoading ? 'true' : 'false';
+
         $aliasLoaderInitClassContent = <<<EOF
 <?php
 
@@ -153,6 +158,7 @@ class ClassAliasLoaderInit$suffix {
         \$classAliasLoader = new TYPO3\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
         \$classAliasLoader->setAliasMap(\$classAliasMap);
         \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
+        \$classAliasLoader->setForceAliasLoading($forceAliasLoadingString);
         \$classAliasLoader->register($prependAutoloader);
 
         TYPO3\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
