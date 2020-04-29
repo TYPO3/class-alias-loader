@@ -14,6 +14,7 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 
 /**
  * Class Plugin
@@ -31,6 +32,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     protected $io;
 
     /**
+     * @var ClassAliasMapGenerator
+     */
+    private $aliasMapGenerator;
+
+    /**
      * Apply plugin modifications to composer
      *
      * @param Composer $composer
@@ -40,6 +46,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->aliasMapGenerator = new ClassAliasMapGenerator(
+            $this->composer,
+            $this->io
+        );
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -73,28 +83,31 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'post-autoload-dump' => array('onPostAutoloadDump')
+            'pre-autoload-dump' => array('onPreAutoloadDump'),
+            'post-autoload-dump' => array('onPostAutoloadDump'),
         );
     }
 
     /**
-     * Plugin callback for this script event, which calls the previously implemented static method
-     *
-     * @param \Composer\Script\Event $event
+     * @param Event $event
+     * @throws \Exception
      * @return bool
      */
-    public function onPostAutoloadDump(\Composer\Script\Event $event)
+    public function onPreAutoloadDump(Event $event)
+    {
+        return $this->aliasMapGenerator->generateAliasMapFiles();
+    }
+
+    /**
+     * @param Event $event
+     * @return bool
+     */
+    public function onPostAutoloadDump(Event $event)
     {
         $flags = $event->getFlags();
         $config = $event->getComposer()->getConfig();
         $optimizeAutoloadFiles = !empty($flags['optimize']) || $config->get('optimize-autoloader') || $config->get('classmap-authoritative');
 
-        $aliasMapGenerator = new ClassAliasMapGenerator(
-            $event->getComposer(),
-            $event->getIO(),
-            $optimizeAutoloadFiles
-        );
-
-        return $aliasMapGenerator->generateAliasMap();
+        return $this->aliasMapGenerator->modifyComposerGeneratedFiles($optimizeAutoloadFiles);
     }
 }

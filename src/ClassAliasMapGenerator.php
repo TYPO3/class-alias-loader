@@ -11,11 +11,13 @@ namespace TYPO3\ClassAliasLoader;
  */
 
 use Composer\Composer;
-use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Composer\Package\PackageInterface;
 use Composer\Util\Filesystem;
+use TYPO3\ClassAliasLoader\Config;
+use TYPO3\ClassAliasLoader\IncludeFile\CaseSensitiveToken;
+use TYPO3\ClassAliasLoader\IncludeFile\PrependToken;
 
 /**
  * This class loops over all packages that are installed by composer and
@@ -36,34 +38,32 @@ class ClassAliasMapGenerator
     protected $io;
 
     /**
-     * @var bool
+     * @var Config
      */
-    protected $optimizeAutoloadFiles = false;
+    private $config;
 
     /**
      * @param Composer $composer
      * @param IOInterface $io
-     * @param bool $optimizeAutoloadFiles
      */
-    public function __construct(Composer $composer, IOInterface $io = null, $optimizeAutoloadFiles = false)
+    public function __construct(Composer $composer, IOInterface $io = null, Config $config = null)
     {
         $this->composer = $composer;
         $this->io = $io ?: new NullIO();
-        $this->optimizeAutoloadFiles = $optimizeAutoloadFiles;
+        $this->config = $config ?: new Config($this->composer->getPackage());
     }
 
     /**
-     * @return bool
      * @throws \Exception
+     * @return bool
      */
-    public function generateAliasMap()
+    public function generateAliasMapFiles()
     {
         $config = $this->composer->getConfig();
 
         $filesystem = new Filesystem();
-        $filesystem->ensureDirectoryExists($config->get('vendor-dir'));
-        $basePath = $this->extractBasePath($config);
-        $vendorPath = $filesystem->normalizePath(realpath($config->get('vendor-dir')));
+        $basePath = $filesystem->normalizePath(substr($config->get('vendor-dir'), 0, -strlen($config->get('vendor-dir', $config::RELATIVE_PATHS))));
+        $vendorPath = $config->get('vendor-dir');
         $targetDir = $vendorPath . '/composer';
         $filesystem->ensureDirectoryExists($targetDir);
 
@@ -79,7 +79,7 @@ class ClassAliasMapGenerator
         foreach ($packageMap as $item) {
             /** @var PackageInterface $package */
             list($package, $installPath) = $item;
-            $aliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($package, $this->io);
+            $aliasLoaderConfig = new Config($package, $this->io);
             if ($aliasLoaderConfig->get('class-alias-maps') !== null) {
                 if (!is_array($aliasLoaderConfig->get('class-alias-maps'))) {
                     throw new \Exception('Configuration option "class-alias-maps" must be an array');
@@ -88,27 +88,26 @@ class ClassAliasMapGenerator
                     $mapFilePath = ($installPath ?: $basePath) . '/' . $filesystem->normalizePath($mapFile);
                     if (!is_file($mapFilePath)) {
                         $this->io->writeError(sprintf('The class alias map file "%s" configured in package "%s" was not found!', $mapFile, $package->getName()));
-                    } else {
-                        $packageAliasMap = require $mapFilePath;
-                        if (!is_array($packageAliasMap)) {
-                            throw new \Exception('Class alias map files must return an array', 1422625075);
-                        }
-                        if (!empty($packageAliasMap)) {
-                            $classAliasMappingFound = true;
-                        }
-                        foreach ($packageAliasMap as $aliasClassName => $className) {
-                            $lowerCasedAliasClassName = strtolower($aliasClassName);
-                            $aliasToClassNameMapping[$lowerCasedAliasClassName] = $className;
-                            $classNameToAliasMapping[$className][$lowerCasedAliasClassName] = $lowerCasedAliasClassName;
-                        }
+                        continue;
+                    }
+                    $packageAliasMap = require $mapFilePath;
+                    if (!is_array($packageAliasMap)) {
+                        throw new \Exception('Class alias map files must return an array', 1422625075);
+                    }
+                    if (!empty($packageAliasMap)) {
+                        $classAliasMappingFound = true;
+                    }
+                    foreach ($packageAliasMap as $aliasClassName => $className) {
+                        $lowerCasedAliasClassName = strtolower($aliasClassName);
+                        $aliasToClassNameMapping[$lowerCasedAliasClassName] = $className;
+                        $classNameToAliasMapping[$className][$lowerCasedAliasClassName] = $lowerCasedAliasClassName;
                     }
                 }
             }
         }
 
-        $mainPackageAliasLoaderConfig = new \TYPO3\ClassAliasLoader\Config($mainPackage);
-        $alwaysAddAliasLoader = $mainPackageAliasLoaderConfig->get('always-add-alias-loader');
-        $caseSensitiveClassLoading = $mainPackageAliasLoaderConfig->get('autoload-case-sensitivity');
+        $alwaysAddAliasLoader = $this->config->get('always-add-alias-loader');
+        $caseSensitiveClassLoading = $this->config->get('autoload-case-sensitivity');
 
         if (!$alwaysAddAliasLoader && !$classAliasMappingFound && $caseSensitiveClassLoading) {
             // No mapping found in any package and no insensitive class loading active. We return early and skip rewriting
@@ -116,90 +115,46 @@ class ClassAliasMapGenerator
             return false;
         }
 
-        $caseSensitiveClassLoadingString = $caseSensitiveClassLoading ? 'true' : 'false';
+        $includeFile = new IncludeFile(
+            $this->io,
+            $this->composer,
+            array(
+                new CaseSensitiveToken(
+                    $this->io,
+                    $this->config
+                ),
+                new PrependToken(
+                    $this->io,
+                    $this->composer->getConfig()
+                ),
+            )
+        );
+        $includeFile->register();
+
         $this->io->write('<info>Generating ' . ($classAliasMappingFound ? '' : 'empty ') . 'class alias map file</info>');
         $this->generateAliasMapFile($aliasToClassNameMapping, $classNameToAliasMapping, $targetDir);
-
-        $suffix = null;
-        if (!$config->get('autoloader-suffix') && is_readable($vendorPath . '/autoload.php')) {
-            $content = file_get_contents($vendorPath . '/autoload.php');
-            if (preg_match('{ComposerAutoloaderInit([^:\s]+)::}', $content, $match)) {
-                $suffix = $match[1];
-            }
-        }
-
-        if (!$suffix) {
-            $suffix = $config->get('autoloader-suffix') ?: md5(uniqid('', true));
-        }
-
-        $prependAutoloader = $config->get('prepend-autoloader') === false ? 'false' : 'true';
-
-        $aliasLoaderInitClassContent = <<<EOF
-<?php
-
-// autoload_alias_loader_real.php @generated by typo3/class-alias-loader
-
-class ClassAliasLoaderInit$suffix {
-
-    private static \$loader;
-
-    public static function initializeClassAliasLoader(\$composerClassLoader) {
-        if (null !== self::\$loader) {
-            return self::\$loader;
-        }
-        self::\$loader = \$composerClassLoader;
-
-        \$classAliasMap = require __DIR__ . '/autoload_classaliasmap.php';
-        \$classAliasLoader = new TYPO3\ClassAliasLoader\ClassAliasLoader(\$composerClassLoader);
-        \$classAliasLoader->setAliasMap(\$classAliasMap);
-        \$classAliasLoader->setCaseSensitiveClassLoading($caseSensitiveClassLoadingString);
-        \$classAliasLoader->register($prependAutoloader);
-
-        TYPO3\ClassAliasLoader\ClassAliasMap::setClassAliasLoader(\$classAliasLoader);
-
-        return self::\$loader;
-    }
-}
-
-EOF;
-        file_put_contents($targetDir . '/autoload_alias_loader_real.php', $aliasLoaderInitClassContent);
-
-        if (!$caseSensitiveClassLoading) {
-            $this->io->write('<info>Re-writing class map to support case insensitive class loading</info>');
-            if (!$this->optimizeAutoloadFiles) {
-                $this->io->write('<warning>Case insensitive class loading only works reliably if you use the optimize class loading feature of composer</warning>');
-            }
-            $this->rewriteClassMapWithLowerCaseClassNames($targetDir);
-        }
-
-        $this->io->write('<info>Inserting class alias loader into main autoload.php file</info>');
-        $this->modifyMainAutoloadFile($vendorPath . '/autoload.php', $suffix);
 
         return true;
     }
 
     /**
-     * @param $autoloadFile
-     * @param string $suffix
+     * @deprecated will be removed with 2.0
+     * @param $optimizeAutoloadFiles
+     * @return bool
      */
-    protected function modifyMainAutoloadFile($autoloadFile, $suffix)
+    public function modifyComposerGeneratedFiles($optimizeAutoloadFiles = false)
     {
-        $originalAutoloadFileContent = file_get_contents($autoloadFile);
-        preg_match('/return ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
-        $originalAutoloadFileContent = str_replace($matches[0], '', $originalAutoloadFileContent);
-        $composerClassLoaderInit = str_replace(array('return ', ';'), '', $matches[0]);
-        $autoloadFileContent = <<<EOF
-$originalAutoloadFileContent
+        $caseSensitiveClassLoading = $this->config->get('autoload-case-sensitivity');
+        $vendorPath = $this->composer->getConfig()->get('vendor-dir');
+        if (!$caseSensitiveClassLoading) {
+            $this->io->writeError('<warning>Re-writing class map to support case insensitive class loading is deprecated</warning>');
+            if (!$optimizeAutoloadFiles) {
+                $this->io->writeError('<warning>Case insensitive class loading only works reliably if you use the optimize class loading feature of composer</warning>');
+            }
+            $this->rewriteClassMapWithLowerCaseClassNames($vendorPath . '/composer');
+        }
 
-// autoload.php @generated by typo3/class-alias-loader
-
-require_once __DIR__ . '/composer/autoload_alias_loader_real.php';
-
-return ClassAliasLoaderInit$suffix::initializeClassAliasLoader($composerClassLoaderInit);
-
-EOF;
-
-        file_put_contents($autoloadFile, $autoloadFileContent);
+        return true;
     }
 
     /**
@@ -234,19 +189,5 @@ EOF;
             return strtolower($match[0]);
         }, $classMapContents);
         file_put_contents($targetDir . '/autoload_classmap.php', $classMapContents);
-    }
-
-    /**
-     * Extracts the base path out of composer config
-     *
-     * @param \Composer\Config $config
-     * @return mixed
-     */
-    protected function extractBasePath(\Composer\Config $config)
-    {
-        $reflectionClass = new \ReflectionClass($config);
-        $reflectionProperty = $reflectionClass->getProperty('baseDir');
-        $reflectionProperty->setAccessible(true);
-        return $reflectionProperty->getValue($config);
     }
 }
