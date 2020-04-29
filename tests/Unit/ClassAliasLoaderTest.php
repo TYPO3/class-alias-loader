@@ -42,29 +42,10 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function callingAnUnknownMethodWillBeProxiedToComposerClassLoader()
-    {
-        $this->composerClassLoaderMock->expects($this->once())->method('getUseIncludePath');
-        $this->subject->getUseIncludePath();
-    }
-
-    /**
-     * @test
-     */
     public function registeringTheAliasLoaderUnregistersComposerClassLoader()
     {
         $this->composerClassLoaderMock->expects($this->once())->method('unregister');
         $this->subject->register();
-    }
-
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionCode 1422631610
-     */
-    public function callingAnUnknownMethodThatDoesNotExistInComposerClassLoaderThrowsException()
-    {
-        $this->subject->fooBar();
     }
 
     /**

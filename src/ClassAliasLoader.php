@@ -196,20 +196,4 @@ class ClassAliasLoader
 
         return false;
     }
-
-    /**
-     * Act as a proxy for method calls to composer class loader
-     *
-     * @param string $method
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($method, $arguments)
-    {
-        if (!is_callable(array($this->composerClassLoader, $method))) {
-            throw new \InvalidArgumentException(sprintf('Method "%s" does not exist!', $method), 1422631610);
-        }
-
-        return call_user_func_array(array($this->composerClassLoader, $method), $arguments);
-    }
 }
