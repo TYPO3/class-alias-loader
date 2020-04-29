@@ -32,6 +32,7 @@ class ClassAliasLoader
     );
 
     /**
+     * @deprecated
      * @var bool
      */
     protected $caseSensitiveClassLoading = true;
@@ -55,6 +56,7 @@ class ClassAliasLoader
     }
 
     /**
+     * @deprecated
      * @param bool $caseSensitiveClassLoading
      */
     public function setCaseSensitiveClassLoading($caseSensitiveClassLoading)
@@ -117,11 +119,13 @@ class ClassAliasLoader
     public function loadClassWithAlias($className)
     {
         $originalClassName = $this->getOriginalClassName($className);
+
         return $originalClassName ? $this->loadOriginalClassAndSetAliases($originalClassName) : $this->loadClass($className);
     }
 
     /**
      * Load class with the option to respect case insensitivity
+     * @deprecated
      *
      * @param string $className
      * @return bool|null
