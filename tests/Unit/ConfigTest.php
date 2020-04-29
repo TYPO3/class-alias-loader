@@ -17,7 +17,7 @@ use TYPO3\ClassAliasLoader\Config;
 /**
  * Test case for Config
  */
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends BaseTestCase
 {
     /**
      * @var Config
@@ -36,8 +36,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->ioMock = $this->getMock('Composer\\IO\\IOInterface');
-        $this->packageMock = $this->getMock('Composer\\Package\\PackageInterface');
+        $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
+        $this->packageMock = $this->getMockBuilder('Composer\\Package\\PackageInterface')->getMock();
 
         $this->subject = new Config($this->packageMock, $this->ioMock);
     }

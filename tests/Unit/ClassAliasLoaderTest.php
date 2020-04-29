@@ -16,7 +16,7 @@ use TYPO3\ClassAliasLoader\ClassAliasLoader;
 /**
  * Test case for ClassAliasLoader
  */
-class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
+class ClassAliasLoaderTest extends BaseTestCase
 {
     /**
      * @var ClassAliasLoader
@@ -30,7 +30,7 @@ class ClassAliasLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->composerClassLoaderMock = $this->getMock('Composer\\Autoload\\ClassLoader');
+        $this->composerClassLoaderMock = $this->getMockBuilder('Composer\\Autoload\\ClassLoader')->getMock();
         $this->subject = new ClassAliasLoader($this->composerClassLoaderMock);
     }
 
