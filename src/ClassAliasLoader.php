@@ -186,7 +186,15 @@ class ClassAliasLoader
      */
     protected function classOrInterfaceExists($className)
     {
-        return class_exists($className, false) || interface_exists($className, false);
+        $classOrInterfaceExists = class_exists($className, false) || interface_exists($className, false);
+        if ($classOrInterfaceExists) {
+            return true;
+        }
+        if (function_exists('trait_exists')) {
+            return trait_exists($className, false);
+        }
+
+        return false;
     }
 
     /**
