@@ -59,10 +59,12 @@ class ClassAliasMapGenerator
 
     /**
      * @deprecated
+     * @throws \Exception
      */
     public function generateAliasMap()
     {
         // Is called during upgrade from older versions, so try to be graceful
+        $this->io->writeError('<warning>Upgraded typo3/class-alias-loader from older plugin version. Please run "composer dumpautoload" to complete the upgrade.</warning>');
     }
 
     /**
