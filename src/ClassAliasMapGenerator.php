@@ -46,10 +46,14 @@ class ClassAliasMapGenerator
      * @param Composer $composer
      * @param IOInterface $io
      */
-    public function __construct(Composer $composer, IOInterface $io = null, Config $config = null)
+    public function __construct(Composer $composer, IOInterface $io = null, $config = null)
     {
         $this->composer = $composer;
         $this->io = $io ?: new NullIO();
+        if (\is_bool($config)) {
+            // Happens during upgrade from older versions, so try to be graceful
+            $config = new Config($this->composer->getPackage());
+        }
         $this->config = $config ?: new Config($this->composer->getPackage());
     }
 
