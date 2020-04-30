@@ -58,6 +58,14 @@ class ClassAliasMapGenerator
     }
 
     /**
+     * @deprecated
+     */
+    public function generateAliasMap()
+    {
+        // Is called during upgrade from older versions, so try to be graceful
+    }
+
+    /**
      * @throws \Exception
      * @return bool
      */
