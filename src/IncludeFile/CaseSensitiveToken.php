@@ -58,7 +58,7 @@ class CaseSensitiveToken implements TokenInterface
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function getContent(string $includeFilePath)
+    public function getContent($includeFilePath)
     {
         return $this->config->get('autoload-case-sensitivity') ? 'true' : 'false';
     }

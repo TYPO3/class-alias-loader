@@ -29,10 +29,12 @@ class IncludeFile
      * @var Filesystem
      */
     private $filesystem;
+
     /**
      * @var IOInterface
      */
     private $io;
+
     /**
      * @var Composer
      */
@@ -77,7 +79,7 @@ class IncludeFile
      * @throws \InvalidArgumentException
      * @return string
      */
-    protected function getIncludeFileContent(string $includeFilePath)
+    protected function getIncludeFileContent($includeFilePath)
     {
         $includeFileTemplate = $this->filesystem->normalizePath(dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE);
         $includeFileContent = file_get_contents($includeFileTemplate);
