@@ -25,5 +25,5 @@ interface TokenInterface
      * @param string $includeFilePath
      * @return string
      */
-    public function getContent(string $includeFilePath);
+    public function getContent($includeFilePath);
 }

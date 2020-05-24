@@ -55,7 +55,7 @@ class PrependToken implements TokenInterface
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function getContent(string $includeFilePath)
+    public function getContent($includeFilePath)
     {
         return $this->config->get('prepend-autoloader') === false ? 'false' : 'true';
     }
