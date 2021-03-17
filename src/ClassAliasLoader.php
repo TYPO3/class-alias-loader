@@ -149,6 +149,9 @@ class ClassAliasLoader
     {
         // Is an original class which has an alias
         if (array_key_exists($aliasOrClassName, $this->aliasMap['classNameToAliasMapping'])) {
+            if ($this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] === null) {
+                return null;
+            }
             return $aliasOrClassName;
         }
 
