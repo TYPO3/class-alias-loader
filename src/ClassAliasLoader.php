@@ -172,9 +172,11 @@ class ClassAliasLoader
     protected function loadOriginalClassAndSetAliases($originalClassName)
     {
         if ($this->classOrInterfaceExists($originalClassName) || $this->loadClass($originalClassName)) {
-            foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
-                if (!$this->classOrInterfaceExists($aliasClassName)) {
-                    class_alias($originalClassName, $aliasClassName);
+            if (is_array($this->aliasMap['classNameToAliasMapping'][$originalClassName])) {
+                foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
+                    if (!$this->classOrInterfaceExists($aliasClassName)) {
+                        class_alias($originalClassName, $aliasClassName);
+                    }
                 }
             }
 
