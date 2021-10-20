@@ -1,4 +1,4 @@
-Class Alias Loader [![Build Status](https://travis-ci.org/TYPO3/class-alias-loader.svg?branch=master)](https://travis-ci.org/TYPO3/class-alias-loader)
+Class Alias Loader ![Build Status](https://github.com/typo3/class-alias-loader/workflows/tests/badge.svg)
 ==================
 
 ## Introduction
