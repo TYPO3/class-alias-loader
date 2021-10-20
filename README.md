@@ -1,4 +1,4 @@
-Class Alias Loader ![Build Status](https://github.com/typo3/class-alias-loader/workflows/tests/badge.svg)
+Class Alias Loader [![Build Status](https://github.com/TYPO3/class-alias-loader/actions/workflows/tests.yml/badge.svg)](https://github.com/TYPO3/class-alias-loader/actions/workflows/tests.yml)
 ==================
 
 ## Introduction
