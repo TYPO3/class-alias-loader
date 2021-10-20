@@ -44,7 +44,10 @@ final class IncludeFileTest extends BaseTestCase
 
     private $testDir = __DIR__;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setMeUp()
     {
         $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
         $this->packageMock = $this->getMockBuilder('Composer\\Package\\RootPackageInterface')->getMock();
@@ -81,7 +84,10 @@ final class IncludeFileTest extends BaseTestCase
         );
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    public function tearMeDown()
     {
         unlink($this->testDir . IncludeFile::INCLUDE_FILE);
         rmdir(dirname($this->testDir . IncludeFile::INCLUDE_FILE));

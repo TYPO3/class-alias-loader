@@ -28,13 +28,19 @@ class ClassAliasLoaderTest extends BaseTestCase
      */
     protected $composerClassLoaderMock;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setMeUp()
     {
         $this->composerClassLoaderMock = $this->getMockBuilder('Composer\\Autoload\\ClassLoader')->getMock();
         $this->subject = new ClassAliasLoader($this->composerClassLoaderMock);
     }
 
-    public function tearDown()
+    /**
+     * @after
+     */
+    public function tearMeDown()
     {
         $this->subject->unregister();
     }

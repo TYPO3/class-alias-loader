@@ -34,7 +34,10 @@ class ConfigTest extends BaseTestCase
      */
     protected $packageMock;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setMeUp()
     {
         $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
         $this->packageMock = $this->getMockBuilder('Composer\\Package\\PackageInterface')->getMock();
@@ -44,12 +47,24 @@ class ConfigTest extends BaseTestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionCode 1444039407
      */
     public function throwsExceptionForEmptyKey()
     {
+        // Use this instead when old PHP versions are dropped and minimum phpunit version can be raised:
+        /**
+        $this->expectException('\\InvalidArgumentException');
+        $this->expectExceptionCode(1444039407);
         $this->subject->get(null);
+         */
+        try {
+            $result = false;
+            $this->subject->get(null);
+        } catch (\InvalidArgumentException $e) {
+            if ($e->getCode() === 1444039407) {
+                $result = true;
+            }
+        }
+        $this->assertTrue($result, 'Expected exception with expected code not received');
     }
 
     /**
