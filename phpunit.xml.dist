@@ -1,0 +1,29 @@
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+        beStrictAboutTestsThatDoNotTestAnything="true"
+        cacheResult="false"
+        colors="true"
+        convertDeprecationsToExceptions="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        failOnRisky="true"
+        failOnWarning="true"
+        forceCoversAnnotation="false"
+        processIsolation="false"
+        stopOnError="false"
+        stopOnFailure="false"
+        stopOnIncomplete="false"
+        stopOnSkipped="false"
+        verbose="false"
+>
+    <testsuites>
+        <testsuite name="Unit tests">
+            <directory>tests/Unit/</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="error_reporting" value="E_ALL" />
+    </php>
+</phpunit>

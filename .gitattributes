@@ -3,3 +3,4 @@
 /.php_cs.dist export-ignore
 /.github export-ignore
 /tests
+/phpunit.xml.dist export-ignore
