@@ -11,6 +11,7 @@ namespace TYPO3\ClassAliasLoader\Test\Unit;
  */
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
+use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\ClassAliasLoader\ClassAliasLoader;
 
 /**
@@ -24,7 +25,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     protected $subject;
 
     /**
-     * @var ComposerClassLoader|\PHPUnit_Framework_MockObject_MockObject
+     * @var ComposerClassLoader|MockObject|PHPUnit_Framework_MockObject_MockObject
      */
     protected $composerClassLoaderMock;
 
@@ -95,6 +96,19 @@ class ClassAliasLoaderTest extends BaseTestCase
         });
         $this->subject->loadClassWithAlias($testClassName);
         $this->assertTrue(class_exists($testClassName, false));
+    }
+
+    /**
+     * @test
+     */
+    public function callingLoadClassMultipleTimesInEdgeCasesWillStillWork()
+    {
+        $this->composerClassLoaderMock
+            ->expects($this->exactly(2))
+            ->method('loadClass')
+            ->willReturnOnConsecutiveCalls(false, true);
+        $this->assertFalse($this->subject->loadClassWithAlias('TestClass'));
+        $this->assertTrue($this->subject->loadClassWithAlias('TestClass'));
     }
 
     /**

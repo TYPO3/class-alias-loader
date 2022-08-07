@@ -120,7 +120,9 @@ class ClassAliasLoader
     {
         $originalClassName = $this->getOriginalClassName($className);
 
-        return $originalClassName ? $this->loadOriginalClassAndSetAliases($originalClassName) : $this->loadClass($className);
+        return $originalClassName
+            ? $this->loadOriginalClassAndSetAliases($originalClassName)
+            : $this->loadClass($className);
     }
 
     /**
@@ -149,19 +151,19 @@ class ClassAliasLoader
     {
         // Is an original class which has an alias
         if (array_key_exists($aliasOrClassName, $this->aliasMap['classNameToAliasMapping'])) {
-            if ($this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] === null) {
-                return null;
-            }
-            return $aliasOrClassName;
+            return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] === array()
+                ? null
+                : $aliasOrClassName
+                ;
         }
-
-        // Is an alias (we're graceful regarding casing for alias definitions)
+        // Is an alias (we're graceful ignoring casing for alias definitions)
         $lowerCasedClassName = strtolower($aliasOrClassName);
         if (array_key_exists($lowerCasedClassName, $this->aliasMap['aliasToClassNameMapping'])) {
             return $this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName];
         }
         // No alias registered for this class name, return and remember that info
-        return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = null;
+        $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = array();
+        return null;
     }
 
     /**
