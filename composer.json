@@ -20,7 +20,7 @@
         "psr-4": { "TYPO3\\ClassAliasLoader\\Test\\": "tests/"}
     },
     "require": {
-        "php": ">=5.3.7",
+        "php": ">=7.1",
         "composer-plugin-api": "^1.0 || ^2.0"
     },
     "require-dev": {
