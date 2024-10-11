@@ -39,7 +39,7 @@ class Config
      * @param PackageInterface $package
      * @param IOInterface $io
      */
-    public function __construct(PackageInterface $package, IOInterface $io = null)
+    public function __construct(PackageInterface $package, ?IOInterface $io = null)
     {
         $this->io = $io ?: new NullIO();
         $this->setAliasLoaderConfigFromPackage($package);
@@ -55,7 +55,8 @@ class Config
             throw new \InvalidArgumentException('Configuration key must not be empty', 1444039407);
         }
         // Extract parts of the path
-        $configKey = str_getcsv($configKey, '.');
+        $configKey = str_getcsv($configKey, '.',  '"', '\\');
+
         // Loop through each part and extract its value
         $value = $this->config;
         foreach ($configKey as $segment) {

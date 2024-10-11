@@ -46,7 +46,7 @@ class ClassAliasMapGenerator
      * @param Composer $composer
      * @param IOInterface $io
      */
-    public function __construct(Composer $composer, IOInterface $io = null, $config = null)
+    public function __construct(Composer $composer, ?IOInterface $io = null, $config = null)
     {
         $this->composer = $composer;
         $this->io = $io ?: new NullIO();
