@@ -14,13 +14,14 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use TYPO3\ClassAliasLoader\Config;
 use TYPO3\ClassAliasLoader\IncludeFile;
 
 /**
  * Test case for IncludeFile
  */
-final class IncludeFileTest extends BaseTestCase
+final class IncludeFileTest extends TestCase
 {
     /**
      * @var IncludeFile
@@ -44,10 +45,7 @@ final class IncludeFileTest extends BaseTestCase
 
     private $testDir = __DIR__;
 
-    /**
-     * @before
-     */
-    public function setMeUp()
+    public function setUp(): void
     {
         $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
         $this->packageMock = $this->getMockBuilder('Composer\\Package\\RootPackageInterface')->getMock();
@@ -84,17 +82,14 @@ final class IncludeFileTest extends BaseTestCase
         );
     }
 
-    /**
-     * @after
-     */
-    public function tearMeDown()
+    public function tearDown(): void
     {
         unlink($this->testDir . IncludeFile::INCLUDE_FILE);
         rmdir(dirname($this->testDir . IncludeFile::INCLUDE_FILE));
     }
 
 
-    public function testIncludeFileCanPeWritten()
+    public function testIncludeFileCanPeWritten(): void
     {
         $this->subject->register();
         self::assertTrue(file_exists($this->testDir . IncludeFile::INCLUDE_FILE));

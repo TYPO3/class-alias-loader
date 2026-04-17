@@ -21,12 +21,12 @@
     },
     "require": {
         "php": ">=7.1",
-        "composer-plugin-api": "^1.0 || ^2.0"
+        "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^1.1@dev || ^2.0@dev",
+        "composer/composer": "^2.0@dev",
         "mikey179/vfsstream": "~1.4.0@dev",
-        "phpunit/phpunit": ">4.8 <9"
+        "phpunit/phpunit": "^8 || ^9"
     },
     "replace": {
         "helhum/class-alias-loader": "*"

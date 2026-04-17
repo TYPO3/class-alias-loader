@@ -12,12 +12,13 @@ namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use TYPO3\ClassAliasLoader\ClassAliasLoader;
 
 /**
  * Test case for ClassAliasLoader
  */
-class ClassAliasLoaderTest extends BaseTestCase
+class ClassAliasLoaderTest extends TestCase
 {
     /**
      * @var ClassAliasLoader
@@ -25,23 +26,17 @@ class ClassAliasLoaderTest extends BaseTestCase
     protected $subject;
 
     /**
-     * @var ComposerClassLoader|MockObject|PHPUnit_Framework_MockObject_MockObject
+     * @var ComposerClassLoader|MockObject
      */
     protected $composerClassLoaderMock;
 
-    /**
-     * @before
-     */
-    public function setMeUp()
+    public function setUp(): void
     {
         $this->composerClassLoaderMock = $this->getMockBuilder('Composer\\Autoload\\ClassLoader')->getMock();
         $this->subject = new ClassAliasLoader($this->composerClassLoaderMock);
     }
 
-    /**
-     * @after
-     */
-    public function tearMeDown()
+    public function tearDown(): void
     {
         $this->subject->unregister();
     }
@@ -49,7 +44,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOn()
+    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOn(): void
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
         $this->subject->loadClassWithAlias('TestClass');
@@ -58,7 +53,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOffButClassIsFound()
+    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOffButClassIsFound(): void
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturn(true);
         $this->subject->setCaseSensitiveClassLoading(false);
@@ -68,7 +63,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function composerLoadClassIsCalledTwiceWhenCaseSensitiveClassLoadingIsOffAndClassIsNotFound()
+    public function composerLoadClassIsCalledTwiceWhenCaseSensitiveClassLoadingIsOffAndClassIsNotFound(): void
     {
         $this->composerClassLoaderMock->expects($this->exactly(2))->method('loadClass');
         $this->subject->setCaseSensitiveClassLoading(false);
@@ -78,7 +73,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function loadsClassIfNoAliasIsFound()
+    public function loadsClassIfNoAliasIsFound(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturnCallback(function ($className) {
@@ -92,7 +87,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function callingLoadClassMultipleTimesInEdgeCasesWillStillWork()
+    public function callingLoadClassMultipleTimesInEdgeCasesWillStillWork(): void
     {
         $this->composerClassLoaderMock
             ->expects($this->exactly(2))
@@ -105,7 +100,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function loadClassWithOriginalClassNameSetsAliases()
+    public function loadClassWithOriginalClassNameSetsAliases(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -134,7 +129,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function getClassNameForAliasReturnsClassNameForEachAlias()
+    public function getClassNameForAliasReturnsClassNameForEachAlias(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -157,7 +152,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function addAliasMapAddsAliasesCorrectlyToTheMap()
+    public function addAliasMapAddsAliasesCorrectlyToTheMap(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -185,7 +180,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function getClassNameForAliasReturnsClassNameForClassName()
+    public function getClassNameForAliasReturnsClassNameForClassName(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -207,7 +202,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function getClassNameForAliasReturnsClassNameForClassNameWithNoAliasMapSet()
+    public function getClassNameForAliasReturnsClassNameForClassNameWithNoAliasMapSet(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testClassName));
@@ -216,7 +211,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function loadClassWithAliasClassNameSetsAliasesAndLoadsOriginalClass()
+    public function loadClassWithAliasClassNameSetsAliasesAndLoadsOriginalClass(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -246,7 +241,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function aliasesInstancesHaveOriginalClassName()
+    public function aliasesInstancesHaveOriginalClassName(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -279,7 +274,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function classAliasesAreGracefullySetIfClassAlreadyExists()
+    public function classAliasesAreGracefullySetIfClassAlreadyExists(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -310,7 +305,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function interfaceAliasesAreGracefullySetIfInterfaceAlreadyExists()
+    public function interfaceAliasesAreGracefullySetIfInterfaceAlreadyExists(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -338,7 +333,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function classAliasesAreNotReEstablishedIfTheyAlreadyExist()
+    public function classAliasesAreNotReEstablishedIfTheyAlreadyExist(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
@@ -366,7 +361,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClass()
+    public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClass(): void
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
         $this->assertNull($this->subject->loadClassWithAlias('TestClass'));
@@ -375,7 +370,7 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClassEvenIfItExistsInMap()
+    public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClassEvenIfItExistsInMap(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));

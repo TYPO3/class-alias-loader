@@ -12,12 +12,14 @@ namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use TYPO3\ClassAliasLoader\Config;
 
 /**
  * Test case for Config
  */
-class ConfigTest extends BaseTestCase
+class ConfigTest extends TestCase
 {
     /**
      * @var Config
@@ -25,30 +27,26 @@ class ConfigTest extends BaseTestCase
     protected $subject;
 
     /**
-     * @var IOInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var IOInterface|MockObject
      */
     protected $ioMock;
 
     /**
-     * @var PackageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var PackageInterface|MockObject
      */
     protected $packageMock;
 
-    /**
-     * @before
-     */
-    public function setMeUp()
+    public function setUp(): void
     {
         $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
         $this->packageMock = $this->getMockBuilder('Composer\\Package\\PackageInterface')->getMock();
-
         $this->subject = new Config($this->packageMock, $this->ioMock);
     }
 
     /**
      * @test
      */
-    public function throwsExceptionForEmptyKey()
+    public function throwsExceptionForEmptyKey(): void
     {
         // Use this instead when old PHP versions are dropped and minimum phpunit version can be raised:
         /**
@@ -70,7 +68,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function defaultConfigIsAppliedWhenNothingIsConfiguredInPackage()
+    public function defaultConfigIsAppliedWhenNothingIsConfiguredInPackage(): void
     {
         $this->assertFalse($this->subject->get('always-add-alias-loader'));
         $this->assertTrue($this->subject->get('autoload-case-sensitivity'));
@@ -80,7 +78,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function aliasMapConfigIsExtracted()
+    public function aliasMapConfigIsExtracted(): void
     {
         $this->packageMock->expects($this->any())->method('getExtra')->willReturn(
             array(
@@ -100,7 +98,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function aliasMapConfigIsExtractedFromDeprecatedKey()
+    public function aliasMapConfigIsExtractedFromDeprecatedKey(): void
     {
         $this->packageMock->expects($this->any())->method('getExtra')->willReturn(
             array(
@@ -121,7 +119,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function otherConfigIsExtracted()
+    public function otherConfigIsExtracted(): void
     {
         $this->packageMock->expects($this->any())->method('getExtra')->willReturn(
             array(
@@ -141,7 +139,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function otherConfigIsExtractedFromDeprecatedKey()
+    public function otherConfigIsExtractedFromDeprecatedKey(): void
     {
         $this->packageMock->expects($this->any())->method('getExtra')->willReturn(
             array(
@@ -161,7 +159,7 @@ class ConfigTest extends BaseTestCase
     /**
      * @test
      */
-    public function caseSensitivityConfigIsExtractedFromVeryDeprecatedKey()
+    public function caseSensitivityConfigIsExtractedFromVeryDeprecatedKey(): void
     {
         $this->packageMock->expects($this->any())->method('getExtra')->willReturn(
             array(
