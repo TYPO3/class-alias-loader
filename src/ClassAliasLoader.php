@@ -151,19 +151,10 @@ class ClassAliasLoader
     {
         // Is an original class which has an alias
         if (array_key_exists($aliasOrClassName, $this->aliasMap['classNameToAliasMapping'])) {
-            return $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] === array()
-                ? null
-                : $aliasOrClassName
-                ;
+            return $aliasOrClassName;
         }
         // Is an alias (we're graceful ignoring casing for alias definitions)
-        $lowerCasedClassName = strtolower($aliasOrClassName);
-        if (array_key_exists($lowerCasedClassName, $this->aliasMap['aliasToClassNameMapping'])) {
-            return $this->aliasMap['aliasToClassNameMapping'][$lowerCasedClassName];
-        }
-        // No alias registered for this class name, return and remember that info
-        $this->aliasMap['classNameToAliasMapping'][$aliasOrClassName] = array();
-        return null;
+        return $this->aliasMap['aliasToClassNameMapping'][strtolower($aliasOrClassName)] ?? null;
     }
 
     /**
@@ -176,9 +167,9 @@ class ClassAliasLoader
      */
     protected function loadOriginalClassAndSetAliases($originalClassName)
     {
-        if ($this->classOrInterfaceExists($originalClassName) || $this->loadClass($originalClassName)) {
+        if ($this->classExists($originalClassName) || $this->loadClass($originalClassName)) {
             foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
-                if (!$this->classOrInterfaceExists($aliasClassName)) {
+                if (!$this->classExists($aliasClassName)) {
                     class_alias($originalClassName, $aliasClassName);
                 }
             }
@@ -193,16 +184,10 @@ class ClassAliasLoader
      * @param string $className
      * @return bool
      */
-    protected function classOrInterfaceExists($className)
+    protected function classExists($className)
     {
-        $classOrInterfaceExists = class_exists($className, false) || interface_exists($className, false);
-        if ($classOrInterfaceExists) {
-            return true;
-        }
-        if (function_exists('trait_exists')) {
-            return trait_exists($className, false);
-        }
-
-        return false;
+        return class_exists($className, false)
+            || interface_exists($className, false)
+            || trait_exists($className, false);
     }
 }
