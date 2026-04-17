@@ -32,7 +32,7 @@ class ClassAliasMap
      */
     public static function getClassNameForAlias(string $classNameOrAlias): string
     {
-        if (!static::$classAliasLoader) {
+        if (!isset(static::$classAliasLoader)) {
             return $classNameOrAlias;
         }
 
@@ -44,7 +44,7 @@ class ClassAliasMap
      */
     public static function hasAliasMaps(): bool
     {
-        return is_object(static::$classAliasLoader);
+        return is_object(static::$classAliasLoader ?? null);
     }
 
     /**
@@ -54,7 +54,7 @@ class ClassAliasMap
      */
     public static function addAliasMap(array $aliasMap): void
     {
-        if (!static::$classAliasLoader) {
+        if (!isset(static::$classAliasLoader)) {
             throw new \RuntimeException('Cannot set an alias map as the alias loader is not registered!', 1439228111);
         }
 
@@ -63,7 +63,7 @@ class ClassAliasMap
 
     public static function setClassAliasLoader(ClassAliasLoader $classAliasLoader): void
     {
-        if (static::$classAliasLoader) {
+        if (isset(static::$classAliasLoader)) {
             throw new \RuntimeException('Cannot set the alias loader, as it is already registered!', 1439228112);
         }
         static::$classAliasLoader = $classAliasLoader;
