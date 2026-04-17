@@ -11,6 +11,7 @@ namespace TYPO3\ClassAliasLoader;
  */
 
 use Composer\Composer;
+use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Util\Filesystem;
 use TYPO3\CMS\Composer\Plugin\Core\IncludeFile\TokenInterface;
@@ -61,13 +62,15 @@ class IncludeFile
         $this->io->writeError('<info>Register typo3/class-alias-loader file in root package autoload definition</info>', true, IOInterface::VERBOSE);
 
         // Generate and write the file
-        $includeFile = $this->composer->getConfig()->get('vendor-dir') . self::INCLUDE_FILE;
+        $config = $this->composer->getConfig();
+        $includeFile = $config->get('vendor-dir') . self::INCLUDE_FILE;
+        $relativeIncludeFile = $config->get('vendor-dir', ComposerConfig::RELATIVE_PATHS) . self::INCLUDE_FILE;
         file_put_contents($includeFile, $this->getIncludeFileContent(dirname($includeFile)));
 
         // Register the file in the root package
         $rootPackage = $this->composer->getPackage();
         $autoloadDefinition = $rootPackage->getAutoload();
-        $autoloadDefinition['files'][] = $includeFile;
+        $autoloadDefinition['files'][] = $relativeIncludeFile;
         $rootPackage->setAutoload($autoloadDefinition);
     }
 
