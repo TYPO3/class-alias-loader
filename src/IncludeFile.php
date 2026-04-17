@@ -106,6 +106,6 @@ class IncludeFile
      */
     private static function replaceToken($name, $content, $subject)
     {
-        return str_replace('\'{$' . $name . '}\'', $content, $subject);
+        return str_replace('{$' . $name . '}', $content, $subject);
     }
 }

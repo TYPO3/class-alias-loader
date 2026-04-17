@@ -78,6 +78,7 @@ final class IncludeFileTest extends TestCase
             $this->ioMock,
             $this->composerMock,
             [
+                new IncludeFile\SuffixToken('asdf'),
                 new IncludeFile\PrependToken($configMock),
             ]
         );
@@ -93,6 +94,9 @@ final class IncludeFileTest extends TestCase
     public function includeFileCanBeWritten(): void
     {
         $this->subject->register();
-        self::assertTrue(file_exists($this->testDir . IncludeFile::INCLUDE_FILE));
+        self::assertFileExists($this->testDir . IncludeFile::INCLUDE_FILE);
+        $contents = file_get_contents($this->testDir . IncludeFile::INCLUDE_FILE);
+        self::assertIsString($contents);
+        self::assertStringContainsString('ClassAliasLoaderStaticInitasdf', $contents);
     }
 }
