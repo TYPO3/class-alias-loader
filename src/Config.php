@@ -55,11 +55,11 @@ class Config
             throw new \InvalidArgumentException('Configuration key must not be empty', 1444039407);
         }
         // Extract parts of the path
-        $configKey = str_getcsv($configKey, '.',  '"', '\\');
+        $configParts = str_getcsv($configKey, '.',  '"', '\\');
 
         // Loop through each part and extract its value
         $value = $this->config;
-        foreach ($configKey as $segment) {
+        foreach ($configParts as $segment) {
             if (array_key_exists($segment, $value)) {
                 // Replace current value with child
                 $value = $value[$segment];
