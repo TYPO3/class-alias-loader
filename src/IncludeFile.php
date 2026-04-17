@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader;
 
 /*
@@ -18,8 +21,8 @@ use TYPO3\CMS\Composer\Plugin\Core\IncludeFile\TokenInterface;
 
 class IncludeFile
 {
-    const INCLUDE_FILE = '/typo3/alias-loader-include.php';
-    const INCLUDE_FILE_TEMPLATE = '/res/php/alias-loader-include.tmpl.php';
+    public const INCLUDE_FILE = '/typo3/alias-loader-include.php';
+    public const INCLUDE_FILE_TEMPLATE = '/res/php/alias-loader-include.tmpl.php';
 
     /**
      * @var TokenInterface[]
@@ -54,7 +57,7 @@ class IncludeFile
         $this->io = $io;
         $this->composer = $composer;
         $this->tokens = $tokens;
-        $this->filesystem = $filesystem ?: new Filesystem();
+        $this->filesystem = $filesystem ?? new Filesystem();
     }
 
     public function register()

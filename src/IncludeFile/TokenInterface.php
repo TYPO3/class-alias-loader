@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader\IncludeFile;
 
 /*
@@ -17,7 +20,7 @@ interface TokenInterface
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * The content the token should be replaced with
@@ -25,5 +28,5 @@ interface TokenInterface
      * @param string $includeFilePath
      * @return string
      */
-    public function getContent($includeFilePath);
+    public function getContent(string $includeFilePath): string;
 }

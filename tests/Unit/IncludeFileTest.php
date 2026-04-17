@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 /*
@@ -11,16 +14,15 @@ namespace TYPO3\ClassAliasLoader\Test\Unit;
  */
 
 use Composer\Composer;
+use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use TYPO3\ClassAliasLoader\Config;
 use TYPO3\ClassAliasLoader\IncludeFile;
 
-/**
- * Test case for IncludeFile
- */
 final class IncludeFileTest extends TestCase
 {
     /**
@@ -47,12 +49,12 @@ final class IncludeFileTest extends TestCase
 
     public function setUp(): void
     {
-        $this->ioMock = $this->getMockBuilder('Composer\\IO\\IOInterface')->getMock();
-        $this->packageMock = $this->getMockBuilder('Composer\\Package\\RootPackageInterface')->getMock();
-        $this->composerMock = $this->getMockBuilder('Composer\\Composer')->getMock();
-        $configMock = $this->getMockBuilder('Composer\\Config')->getMock();
+        $this->ioMock = $this->getMockBuilder(IOInterface::class)->getMock();
+        $this->packageMock = $this->getMockBuilder(RootPackageInterface::class)->getMock();
+        $this->composerMock = $this->getMockBuilder(Composer::class)->getMock();
+        $configMock = $this->getMockBuilder(ComposerConfig::class)->getMock();
         $testDir = $this->testDir;
-        $configMock->expects(self::any())
+        $configMock->expects($this->any())
             ->method('get')
             ->willReturnCallback(function ($key) use ($testDir) {
                 switch ($key) {
@@ -65,20 +67,19 @@ final class IncludeFileTest extends TestCase
                 }
             });
         mkdir($testDir . '/typo3');
-        $this->composerMock->expects(self::any())
+        $this->composerMock->expects($this->any())
             ->method('getPackage')
             ->willReturn($this->packageMock);
-        $this->composerMock->expects(self::any())
+        $this->composerMock->expects($this->any())
             ->method('getConfig')
             ->willReturn($configMock);
 
         $this->subject = new IncludeFile(
             $this->ioMock,
             $this->composerMock,
-            array(
-                new IncludeFile\PrependToken($this->ioMock, $configMock),
-                new IncludeFile\CaseSensitiveToken($this->ioMock, new Config($this->packageMock, $this->ioMock))
-            )
+            [
+                new IncludeFile\PrependToken($configMock),
+            ]
         );
     }
 
@@ -88,8 +89,8 @@ final class IncludeFileTest extends TestCase
         rmdir(dirname($this->testDir . IncludeFile::INCLUDE_FILE));
     }
 
-
-    public function testIncludeFileCanPeWritten(): void
+    #[Test]
+    public function includeFileCanBeWritten(): void
     {
         $this->subject->register();
         self::assertTrue(file_exists($this->testDir . IncludeFile::INCLUDE_FILE));

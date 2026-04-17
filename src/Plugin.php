@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader;
 
 /*
@@ -22,16 +25,6 @@ use Composer\Script\Event;
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /**
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
-     * @var IOInterface
-     */
-    protected $io;
-
-    /**
      * @var ClassAliasMapGenerator
      */
     private $aliasMapGenerator;
@@ -44,11 +37,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function activate(Composer $composer, IOInterface $io)
     {
-        $this->composer = $composer;
-        $this->io = $io;
         $this->aliasMapGenerator = new ClassAliasMapGenerator(
-            $this->composer,
-            $this->io
+            $composer,
+            $io
         );
     }
 
@@ -62,30 +53,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         // Nothing to do
     }
 
-    /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     * * The method name to call (priority defaults to 0)
-     * * An array composed of the method name to call and the priority
-     * * An array of arrays composed of the method names to call and respective
-     *   priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     * * array('eventName' => 'methodName')
-     * * array('eventName' => array('methodName', $priority))
-     * * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            'pre-autoload-dump' => array('onPreAutoloadDump'),
-            'post-autoload-dump' => array('onPostAutoloadDump'),
-        );
+        return [
+            'pre-autoload-dump' => ['onPreAutoloadDump'],
+        ];
     }
 
     /**
@@ -93,21 +65,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @throws \Exception
      * @return bool
      */
-    public function onPreAutoloadDump(Event $event)
+    public function onPreAutoloadDump(Event $event): bool
     {
         return $this->aliasMapGenerator->generateAliasMapFiles();
-    }
-
-    /**
-     * @param Event $event
-     * @return bool
-     */
-    public function onPostAutoloadDump(Event $event)
-    {
-        $flags = $event->getFlags();
-        $config = $event->getComposer()->getConfig();
-        $optimizeAutoloadFiles = !empty($flags['optimize']) || $config->get('optimize-autoloader') || $config->get('classmap-authoritative');
-
-        return $this->aliasMapGenerator->modifyComposerGeneratedFiles($optimizeAutoloadFiles);
     }
 }

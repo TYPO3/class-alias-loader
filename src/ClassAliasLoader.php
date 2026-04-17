@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader;
 
 /*
@@ -14,62 +17,29 @@ use Composer\Autoload\ClassLoader as ComposerClassLoader;
 
 /**
  * The main class loader that amends the composer class loader.
- * It deals with the alias maps and the case insensitive class loading if configured.
+ * It deals with the alias maps.
  */
-class ClassAliasLoader
+final class ClassAliasLoader
 {
-    /**
-     * @var ComposerClassLoader
-     */
-    protected $composerClassLoader;
+    private array $aliasMap = [
+        'aliasToClassNameMapping' => [],
+        'classNameToAliasMapping' => [],
+    ];
 
-    /**
-     * @var array
-     */
-    protected $aliasMap = array(
-        'aliasToClassNameMapping' => array(),
-        'classNameToAliasMapping' => array()
-    );
-
-    /**
-     * @deprecated
-     * @var bool
-     */
-    protected $caseSensitiveClassLoading = true;
-
-    /**
-     * @param ComposerClassLoader $composerClassLoader
-     */
-    public function __construct(ComposerClassLoader $composerClassLoader)
-    {
-        $this->composerClassLoader = $composerClassLoader;
-    }
+    public function __construct(private readonly ComposerClassLoader $composerClassLoader) {}
 
     /**
      * Set the alias map
-     *
-     * @param array $aliasMap
      */
-    public function setAliasMap(array $aliasMap)
+    public function setAliasMap(array $aliasMap): void
     {
         $this->aliasMap = $aliasMap;
     }
 
     /**
-     * @deprecated
-     * @param bool $caseSensitiveClassLoading
-     */
-    public function setCaseSensitiveClassLoading($caseSensitiveClassLoading)
-    {
-        $this->caseSensitiveClassLoading = $caseSensitiveClassLoading;
-    }
-
-    /**
      * Adds an alias map and merges it with already available map
-     *
-     * @param array $aliasMap
      */
-    public function addAliasMap(array $aliasMap)
+    public function addAliasMap(array $aliasMap): void
     {
         foreach ($aliasMap['aliasToClassNameMapping'] as $alias => $originalClassName) {
             $lowerCaseAlias = strtolower($alias);
@@ -80,79 +50,52 @@ class ClassAliasLoader
 
     /**
      * Get final class name of alias
-     *
-     * @param string $aliasOrClassName
-     * @return string
      */
-    public function getClassNameForAlias($aliasOrClassName)
+    public function getClassNameForAlias(string $aliasOrClassName): string
     {
-        $lookUpClassName = strtolower($aliasOrClassName);
-
-        return isset($this->aliasMap['aliasToClassNameMapping'][$lookUpClassName]) ? $this->aliasMap['aliasToClassNameMapping'][$lookUpClassName] : $aliasOrClassName;
+        return $this->aliasMap['aliasToClassNameMapping'][strtolower($aliasOrClassName)] ?? $aliasOrClassName;
     }
 
     /**
-     * Registers this instance as an autoloader.
-     *
-     * @param bool $prepend Whether to prepend the autoloader or not
+     * Registers this instance as autoloader.
      */
-    public function register($prepend = false)
+    public function register(bool $prepend = false): void
     {
-        spl_autoload_unregister(array($this->composerClassLoader, 'loadClass'));
-        spl_autoload_register(array($this, 'loadClassWithAlias'), true, $prepend);
+        spl_autoload_unregister([$this->composerClassLoader, 'loadClass']);
+        spl_autoload_register([$this, 'loadClassWithAlias'], true, $prepend);
     }
 
     /**
      * Unregisters this instance as an autoloader.
      */
-    public function unregister()
+    public function unregister(): void
     {
-        spl_autoload_unregister(array($this, 'loadClassWithAlias'));
+        spl_autoload_unregister([$this, 'loadClassWithAlias']);
     }
 
     /**
      * Main class loading method registered with spl_autoload_register()
-     *
-     * @param string $className
-     * @return bool
      */
-    public function loadClassWithAlias($className)
+    public function loadClassWithAlias(string $className): ?bool
     {
         $originalClassName = $this->getOriginalClassName($className);
 
-        return $originalClassName
-            ? $this->loadOriginalClassAndSetAliases($originalClassName)
-            : $this->loadClass($className);
-    }
-
-    /**
-     * Load class with the option to respect case insensitivity
-     * @deprecated
-     *
-     * @param string $className
-     * @return bool|null
-     */
-    public function loadClass($className)
-    {
-        $classFound = $this->composerClassLoader->loadClass($className);
-        if (!$classFound && !$this->caseSensitiveClassLoading) {
-            $classFound = $this->composerClassLoader->loadClass(strtolower($className));
-        }
-        return $classFound;
+        return $originalClassName === null
+            ? $this->composerClassLoader->loadClass($className)
+            : $this->loadOriginalClassAndSetAliases($originalClassName);
     }
 
     /**
      * Looks up the original class name from the alias map
-     *
-     * @param string $aliasOrClassName
-     * @return string|NULL NULL if no alias mapping is found or the original class name as string
+     * returns null if no alias mapping is found or the original class name as string
      */
-    protected function getOriginalClassName($aliasOrClassName)
+    private function getOriginalClassName(string $aliasOrClassName): ?string
     {
         // Is an original class which has an alias
         if (array_key_exists($aliasOrClassName, $this->aliasMap['classNameToAliasMapping'])) {
             return $aliasOrClassName;
         }
+
         // Is an alias (we're graceful ignoring casing for alias definitions)
         return $this->aliasMap['aliasToClassNameMapping'][strtolower($aliasOrClassName)] ?? null;
     }
@@ -161,13 +104,10 @@ class ClassAliasLoader
      * Load classes and set aliases.
      * The class_exists calls are safety guards to avoid fatals when
      * class files were included or aliases were set manually in userland code.
-     *
-     * @param string $originalClassName
-     * @return bool|null
      */
-    protected function loadOriginalClassAndSetAliases($originalClassName)
+    private function loadOriginalClassAndSetAliases(string $originalClassName): ?bool
     {
-        if ($this->classExists($originalClassName) || $this->loadClass($originalClassName)) {
+        if ($this->classExists($originalClassName) || $this->composerClassLoader->loadClass($originalClassName)) {
             foreach ($this->aliasMap['classNameToAliasMapping'][$originalClassName] as $aliasClassName) {
                 if (!$this->classExists($aliasClassName)) {
                     class_alias($originalClassName, $aliasClassName);
@@ -180,11 +120,7 @@ class ClassAliasLoader
         return null;
     }
 
-    /**
-     * @param string $className
-     * @return bool
-     */
-    protected function classExists($className)
+    private function classExists(string $className): bool
     {
         return class_exists($className, false)
             || interface_exists($className, false)

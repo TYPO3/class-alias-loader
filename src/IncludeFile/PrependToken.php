@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader\IncludeFile;
 
 /*
@@ -21,11 +24,6 @@ class PrependToken implements TokenInterface
     private $name = 'prepend';
 
     /**
-     * @var IOInterface
-     */
-    private $io;
-
-    /**
      * @var Config
      */
     private $config;
@@ -36,26 +34,17 @@ class PrependToken implements TokenInterface
      * @param IOInterface $io
      * @param Config $config
      */
-    public function __construct(IOInterface $io, Config $config)
+    public function __construct(Config $config)
     {
-        $this->io = $io;
         $this->config = $config;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $includeFilePath
-     * @throws \InvalidArgumentException
-     * @return string
-     */
-    public function getContent($includeFilePath)
+    public function getContent(string $includeFilePath): string
     {
         return $this->config->get('prepend-autoloader') === false ? 'false' : 'true';
     }
