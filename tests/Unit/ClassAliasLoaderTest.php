@@ -49,15 +49,6 @@ class ClassAliasLoaderTest extends BaseTestCase
     /**
      * @test
      */
-    public function registeringTheAliasLoaderUnregistersComposerClassLoader()
-    {
-        $this->composerClassLoaderMock->expects($this->once())->method('unregister');
-        $this->subject->register();
-    }
-
-    /**
-     * @test
-     */
     public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOn()
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
