@@ -98,7 +98,7 @@ class ClassAliasLoader
      */
     public function register($prepend = false)
     {
-        $this->composerClassLoader->unregister();
+        spl_autoload_unregister(array($this->composerClassLoader, 'loadClass'));
         spl_autoload_register(array($this, 'loadClassWithAlias'), true, $prepend);
     }
 
