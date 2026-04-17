@@ -42,37 +42,8 @@ return array(
 );
 ```
 
-The '::class' constant is not available before PHP 5.5. Under a PHP before 5.5 the mapping file can look like this:
 
-```
-<?php
-return array(
-    'Tx_About_Controller_AboutController' => 'TYPO3\\CMS\\About\\Controller\\AboutController',
-    'Tx_About_Domain_Model_Extension' => 'TYPO3\\CMS\\About\\Domain\\Model\\Extension',
-    'Tx_About_Domain_Repository_ExtensionRepository' => 'TYPO3\\CMS\\About\\Domain\\Repository\\ExtensionRepository',
-    'Tx_Aboutmodules_Controller_ModulesController' => 'TYPO3\\CMS\\Aboutmodules\\Controller\\ModulesController',
-);
-```
-
-In your *root* `composer.json` file, you can decide whether to allow classes to be found that are requested with wrong casing.
-Since PHP is case insensitive for class names, but PSR class loading standards bound file names to class names, class names de facto
-become case sensitive. For legacy packages it may be useful however to allow class names to be loaded even if wrong casing is provided.
-For this to work properly, you need to use the composer [optimize class loading information feature](https://getcomposer.org/doc/03-cli.md#global-options).
-
-
-You can activate this feature like this:
-
-```
-    "extra": {
-        "typo3/class-alias-loader": {
-            "autoload-case-sensitivity": false
-        }
-    },
-```
-
-The default value of this option is `true`.
-
-If no alias mapping is found and case sensitivity is set to `true` then by default this package does nothing. It means no additional class loading information is dumped
+If no alias mapping is found then by default this package does nothing. It means no additional class loading information is dumped
 and the `vendor/autoload.php` is not changed. This enables library vendors to deliver compatibility packages which provide such aliases
 for backwards compatibility, but keep the library clean (and faster) for new users.
 

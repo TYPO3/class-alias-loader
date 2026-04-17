@@ -20,13 +20,14 @@
         "psr-4": { "TYPO3\\ClassAliasLoader\\Test\\": "tests/"}
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=8.2",
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
         "composer/composer": "^2.0@dev",
         "mikey179/vfsstream": "~1.4.0@dev",
-        "phpunit/phpunit": "^8 || ^9"
+        "phpunit/phpunit": "^11",
+        "friendsofphp/php-cs-fixer": "^3.95"
     },
     "replace": {
         "helhum/class-alias-loader": "*"
@@ -34,7 +35,7 @@
     "extra": {
         "class": "TYPO3\\ClassAliasLoader\\Plugin",
         "branch-alias": {
-            "dev-main": "1.1.x-dev"
+            "dev-main": "2.0.x-dev"
         }
     }
 }

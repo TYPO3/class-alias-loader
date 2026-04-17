@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader\Test\Unit;
 
 /*
@@ -11,6 +14,7 @@ namespace TYPO3\ClassAliasLoader\Test\Unit;
  */
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use TYPO3\ClassAliasLoader\ClassAliasLoader;
@@ -18,7 +22,7 @@ use TYPO3\ClassAliasLoader\ClassAliasLoader;
 /**
  * Test case for ClassAliasLoader
  */
-class ClassAliasLoaderTest extends TestCase
+final class ClassAliasLoaderTest extends TestCase
 {
     /**
      * @var ClassAliasLoader
@@ -41,65 +45,38 @@ class ClassAliasLoaderTest extends TestCase
         $this->subject->unregister();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOn(): void
     {
-        $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
-        $this->subject->loadClassWithAlias('TestClass');
-    }
-
-    /**
-     * @test
-     */
-    public function composerLoadClassIsCalledOnlyOnceWhenCaseSensitiveClassLoadingIsOffButClassIsFound(): void
-    {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturn(true);
-        $this->subject->setCaseSensitiveClassLoading(false);
         $this->subject->loadClassWithAlias('TestClass');
     }
 
-    /**
-     * @test
-     */
-    public function composerLoadClassIsCalledTwiceWhenCaseSensitiveClassLoadingIsOffAndClassIsNotFound(): void
-    {
-        $this->composerClassLoaderMock->expects($this->exactly(2))->method('loadClass');
-        $this->subject->setCaseSensitiveClassLoading(false);
-        $this->subject->loadClassWithAlias('TestClass');
-    }
-
-    /**
-     * @test
-     */
+    #[Test]
     public function loadsClassIfNoAliasIsFound(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturnCallback(function ($className) {
             eval('class ' . $className . ' {}');
+
             return true;
         });
         $this->subject->loadClassWithAlias($testClassName);
-        $this->assertTrue(class_exists($testClassName, false));
+        self::assertTrue(class_exists($testClassName, false));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function callingLoadClassMultipleTimesInEdgeCasesWillStillWork(): void
     {
         $this->composerClassLoaderMock
             ->expects($this->exactly(2))
             ->method('loadClass')
             ->willReturnOnConsecutiveCalls(false, true);
-        $this->assertFalse($this->subject->loadClassWithAlias('TestClass'));
-        $this->assertTrue($this->subject->loadClassWithAlias('TestClass'));
+        self::assertFalse($this->subject->loadClassWithAlias('TestClass'));
+        self::assertTrue($this->subject->loadClassWithAlias('TestClass'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function loadClassWithOriginalClassNameSetsAliases(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -108,109 +85,100 @@ class ClassAliasLoaderTest extends TestCase
 
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturnCallback(function ($className) {
             eval('class ' . $className . ' {}');
+
             return true;
         });
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         $this->subject->loadClassWithAlias($testClassName);
-        $this->assertTrue(class_exists($testAlias1, false));
-        $this->assertTrue(class_exists($testAlias2, false));
+        self::assertTrue(class_exists($testAlias1, false));
+        self::assertTrue(class_exists($testAlias2, false));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getClassNameForAliasReturnsClassNameForEachAlias(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias1));
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias2));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias1));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias2));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function addAliasMapAddsAliasesCorrectlyToTheMap(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1)],
+            ],
+        ]);
 
-        $this->subject->addAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->addAliasMap([
+            'aliasToClassNameMapping' => [
                 $testAlias2 => $testClassName,
-            ),
-        ));
+            ],
+        ]);
 
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias1));
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias2));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias1));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testAlias2));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getClassNameForAliasReturnsClassNameForClassName(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testClassName));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testClassName));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getClassNameForAliasReturnsClassNameForClassNameWithNoAliasMapSet(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
-        $this->assertEquals($testClassName, $this->subject->getClassNameForAlias($testClassName));
+        self::assertEquals($testClassName, $this->subject->getClassNameForAlias($testClassName));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function loadClassWithAliasClassNameSetsAliasesAndLoadsOriginalClass(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -219,28 +187,27 @@ class ClassAliasLoaderTest extends TestCase
 
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturnCallback(function ($className) {
             eval('class ' . $className . ' {}');
+
             return true;
         });
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         $this->subject->loadClassWithAlias($testAlias1);
-        $this->assertTrue(class_exists($testClassName, false), 'Class name is not loaded');
-        $this->assertTrue(class_exists($testAlias1, false), 'First alias is not loaded');
-        $this->assertTrue(class_exists($testAlias2, false), 'Second alias is not loaded');
+        self::assertTrue(class_exists($testClassName, false), 'Class name is not loaded');
+        self::assertTrue(class_exists($testAlias1, false), 'First alias is not loaded');
+        self::assertTrue(class_exists($testAlias2, false), 'Second alias is not loaded');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function aliasesInstancesHaveOriginalClassName(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -249,31 +216,30 @@ class ClassAliasLoaderTest extends TestCase
 
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass')->willReturnCallback(function ($className) {
             eval('class ' . $className . ' {}');
+
             return true;
         });
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         $this->subject->loadClassWithAlias($testClassName);
 
         $testObject1 = new $testAlias1();
         $testObject2 = new $testAlias2();
 
-        $this->assertSame($testClassName, get_class($testObject1));
-        $this->assertSame($testClassName, get_class($testObject2));
+        self::assertSame($testClassName, get_class($testObject1));
+        self::assertSame($testClassName, get_class($testObject2));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function classAliasesAreGracefullySetIfClassAlreadyExists(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -281,15 +247,15 @@ class ClassAliasLoaderTest extends TestCase
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
         $this->composerClassLoaderMock->expects($this->never())->method('loadClass');
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         eval('class ' . $testClassName . ' {}');
 
@@ -298,13 +264,11 @@ class ClassAliasLoaderTest extends TestCase
         $testObject1 = new $testAlias1();
         $testObject2 = new $testAlias2();
 
-        $this->assertSame($testClassName, get_class($testObject1));
-        $this->assertSame($testClassName, get_class($testObject2));
+        self::assertSame($testClassName, get_class($testObject1));
+        self::assertSame($testClassName, get_class($testObject2));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function interfaceAliasesAreGracefullySetIfInterfaceAlreadyExists(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -312,27 +276,25 @@ class ClassAliasLoaderTest extends TestCase
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
         $this->composerClassLoaderMock->expects($this->never())->method('loadClass');
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         eval('interface ' . $testClassName . ' {}');
 
         $this->subject->loadClassWithAlias($testClassName);
 
-        $this->assertTrue(interface_exists($testAlias1, false), 'First alias is not loaded');
-        $this->assertTrue(interface_exists($testAlias2, false), 'Second alias is not loaded');
+        self::assertTrue(interface_exists($testAlias1, false), 'First alias is not loaded');
+        self::assertTrue(interface_exists($testAlias2, false), 'Second alias is not loaded');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function classAliasesAreNotReEstablishedIfTheyAlreadyExist(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
@@ -340,53 +302,49 @@ class ClassAliasLoaderTest extends TestCase
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
         $this->composerClassLoaderMock->expects($this->never())->method('loadClass');
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         eval('class ' . $testClassName . ' {}');
         class_alias($testClassName, $testAlias1);
 
         $this->subject->loadClassWithAlias($testClassName);
 
-        $this->assertTrue(class_exists($testAlias2, false), 'Second alias is not loaded');
+        self::assertTrue(class_exists($testAlias2, false), 'Second alias is not loaded');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClass(): void
     {
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
-        $this->assertNull($this->subject->loadClassWithAlias('TestClass'));
+        self::assertNull($this->subject->loadClassWithAlias('TestClass'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function loadClassWithAliasReturnsNullIfComposerClassLoaderCannotFindClassEvenIfItExistsInMap(): void
     {
         $testClassName = 'TestClass' . md5(uniqid('bla', true));
         $testAlias1 = 'TestAlias' . md5(uniqid('bla', true));
         $testAlias2 = 'TestAlias' . md5(uniqid('bla', true));
 
-        $this->subject->setAliasMap(array(
-            'aliasToClassNameMapping' => array(
+        $this->subject->setAliasMap([
+            'aliasToClassNameMapping' => [
                 strtolower($testAlias1) => $testClassName,
                 strtolower($testAlias2) => $testClassName,
-            ),
-            'classNameToAliasMapping' => array(
-                $testClassName => array(strtolower($testAlias1), strtolower($testAlias2))
-            ),
-        ));
+            ],
+            'classNameToAliasMapping' => [
+                $testClassName => [strtolower($testAlias1), strtolower($testAlias2)],
+            ],
+        ]);
 
         $this->composerClassLoaderMock->expects($this->once())->method('loadClass');
-        $this->assertNull($this->subject->loadClassWithAlias($testClassName));
+        self::assertNull($this->subject->loadClassWithAlias($testClassName));
     }
 }

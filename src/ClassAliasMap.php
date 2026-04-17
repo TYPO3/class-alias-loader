@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace TYPO3\ClassAliasLoader;
 
 /*
@@ -16,10 +19,7 @@ namespace TYPO3\ClassAliasLoader;
  */
 class ClassAliasMap
 {
-    /**
-     * @var ClassAliasLoader
-     */
-    protected static $classAliasLoader;
+    protected static ClassAliasLoader $classAliasLoader;
 
     /**
      * You can use this method in your code if you compare class names as strings and want to provide compatibility for that as well.
@@ -30,20 +30,19 @@ class ClassAliasMap
      * @param string $classNameOrAlias
      * @return string
      */
-    public static function getClassNameForAlias($classNameOrAlias)
+    public static function getClassNameForAlias(string $classNameOrAlias): string
     {
         if (!static::$classAliasLoader) {
             return $classNameOrAlias;
         }
+
         return static::$classAliasLoader->getClassNameForAlias($classNameOrAlias);
     }
 
     /**
      * Whether or not alias maps are already registered
-     *
-     * @return bool
      */
-    public static function hasAliasMaps()
+    public static function hasAliasMaps(): bool
     {
         return is_object(static::$classAliasLoader);
     }
@@ -51,10 +50,9 @@ class ClassAliasMap
     /**
      * Adds an alias map if the alias loader is registered, throws an exception otherwise.
      *
-     * @param array $aliasMap
      * @throws \RuntimeException
      */
-    public static function addAliasMap(array $aliasMap)
+    public static function addAliasMap(array $aliasMap): void
     {
         if (!static::$classAliasLoader) {
             throw new \RuntimeException('Cannot set an alias map as the alias loader is not registered!', 1439228111);
@@ -63,10 +61,7 @@ class ClassAliasMap
         static::$classAliasLoader->addAliasMap($aliasMap);
     }
 
-    /**
-     * @param ClassAliasLoader $classAliasLoader
-     */
-    public static function setClassAliasLoader(ClassAliasLoader $classAliasLoader)
+    public static function setClassAliasLoader(ClassAliasLoader $classAliasLoader): void
     {
         if (static::$classAliasLoader) {
             throw new \RuntimeException('Cannot set the alias loader, as it is already registered!', 1439228112);
